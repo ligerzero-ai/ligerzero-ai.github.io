@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Explorer | Atomic Structures</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            gap: 4px;
+            margin-bottom: 2rem;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        .element-cell {
+            aspect-ratio: 1;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            background: #f9fafb;
+        }
+        .element-cell:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        .element-cell.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+        .data-panel {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+        #data-status {
+            margin-top: 1rem;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>My Name</h1>
+        <ul>
+            <li><a href="index.html">Introduction</a></li>
+            <li><a href="cv.html">CV</a></li>
+            <li><a href="publications.html">Publications</a></li>
+            <li><a href="presentations.html">Presentations</a></li>
+            <li><a href="youtube.html">YouTube Videos</a></li>
+            <li><a href="github.html">GitHub Repositories</a></li>
+            <li><a href="data-explorer.html" class="active">Data Explorer</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h1>Atomic Data Explorer</h1>
+        <p>Click an element to load its structural data and energy labels (Parquet-backed).</p>
+        
+        <div class="periodic-table" id="periodic-table">
+            <!-- Simplified example: H and He -->
+            <div class="element-cell" onclick="loadElement('H')">1<br><strong>H</strong></div>
+            <div style="grid-column: 18" class="element-cell" onclick="loadElement('He')">2<br><strong>He</strong></div>
+            <!-- ... more elements added via JS ... -->
+        </div>
+
+        <div class="data-panel" id="data-panel">
+            <h3>Selected Element: <span id="selected-symbol">-</span></h3>
+            <div id="data-content">Select an element to view associated energies and forces.</div>
+            <div id="data-status"></div>
+        </div>
+    </main>
+
+    <script>
+        async function loadElement(symbol) {
+            document.getElementById('selected-symbol').innerText = symbol;
+            const status = document.getElementById('data-status');
+            const content = document.getElementById('data-content');
+            
+            status.innerText = `Fetching data for ${symbol}...`;
+            content.innerHTML = '<div class="card">Loading structural data...</div>';
+
+            try {
+                // This would be your Cloudflare R2 URL
+                // e.g., https://data.yourdomain.com/elements/${symbol}.parquet
+                // Using DuckDB-Wasm you can query these directly.
+                
+                status.innerText = `Successfully loaded ${symbol} data. (Simulation of Parquet fetch)`;
+                content.innerHTML = `
+                    <div class="card">
+                        <p><strong>Available Structures:</strong> 1,240</p>
+                        <p><strong>Energy Range:</strong> -452.1 eV to -448.5 eV</p>
+                        <p><strong>Force Labels:</strong> Present (DFT-level)</p>
+                        <button onclick="alert('In a real setup, this would trigger a DuckDB query!')">Preview Data</button>
+                    </div>
+                `;
+            } catch (e) {
+                status.innerText = "Error loading data. Bot protection may be active.";
+            }
+        }
+    </script>
+</body>
+</html>

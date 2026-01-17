@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Videos | Personal Website</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>My Name</h1>
+        <ul>
+            <li><a href="index.html">Introduction</a></li>
+            <li><a href="cv.html">CV</a></li>
+            <li><a href="publications.html">Publications</a></li>
+            <li><a href="presentations.html">Presentations</a></li>
+            <li><a href="youtube.html" class="active">YouTube Videos</a></li>
+            <li><a href="github.html">GitHub Repositories</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="youtube">
+            <h1>YouTube Videos</h1>
+            
+            <div class="card">
+                <h3>My Latest Presentation</h3>
+                <div class="video-container">
+                    <!-- Replace VIDEO_ID with your actual YouTube video ID -->
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+                </div>
+                <p>A brief description of what this video is about.</p>
+            </div>
+
+            <div class="card">
+                <h3>Tutorial: Getting Started with Web Development</h3>
+                <div class="video-container">
+                    <!-- Replace VIDEO_ID with your actual YouTube video ID -->
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
