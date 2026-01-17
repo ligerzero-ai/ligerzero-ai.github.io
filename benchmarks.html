@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarks | Han Lin Mai</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <h1>Han Lin Mai</h1>
+        <ul>
+            <li><a href="index.html">Introduction</a></li>
+            <li><a href="cv.html">CV</a></li>
+            <li><a href="publications.html">Publications</a></li>
+            <li><a href="presentations.html">Presentations</a></li>
+            <li><a href="youtube.html">YouTube Videos</a></li>
+            <li><a href="github.html">GitHub Repositories</a></li>
+            <li><a href="dataset-info.html">Datasets</a></li>
+            <li><a href="data-explorer.html">Data Explorer</a></li>
+            <li><a href="benchmarks.html" class="active">Benchmarks</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h1>Interatomic Potential Benchmarks</h1>
+        <p>
+            A collection of curated benchmarks and datasets for evaluating the accuracy of interatomic potentials and machine learning force fields (MLFFs). 
+            These resources are essential for validating physical quantities such as elastic constants, surface energies, and structural stability.
+        </p>
+
+        <section id="potentials-benchmarks">
+            <h2>Accuracy Evaluation Resources</h2>
+            
+            <div class="card">
+                <h3><a href="https://github.com/materialsproject/matbench" target="_blank">Matbench</a></h3>
+                <p>An ImageNet for materials science. It provides benchmark tasks for predicting various material properties from crystal structure using machine learning.</p>
+                <p><span class="tag">Machine Learning</span> <span class="tag">Materials Project</span></p>
+            </div>
+
+            <div class="card">
+                <h3><a href="https://github.com/usnistgov/jarvis" target="_blank">JARVIS-DFT Benchmarks</a></h3>
+                <p>NIST's Joint Automated Repository for Various Integrated Simulations (JARVIS) provides a large database of DFT calculations for benchmarking interatomic potentials.</p>
+                <p><span class="tag">NIST</span> <span class="tag">DFT</span> <span class="tag">Potential Validation</span></p>
+            </div>
+
+            <div class="card">
+                <h3><a href="https://github.com/colabfit/colabfit-tools" target="_blank">ColabFit</a></h3>
+                <p>A collaborative project for fitting and benchmarking interatomic potentials, providing tools and datasets for consistent evaluation of ML potentials.</p>
+                <p><span class="tag">ML Potentials</span> <span class="tag">Fitting</span></p>
+            </div>
+
+            <div class="card">
+                <h3><a href="https://github.com/mir-group/flare" target="_blank">FLARE Benchmarks</a></h3>
+                <p>Benchmarks focused on on-the-fly active learning of interatomic potentials, useful for evaluating performance in dynamic simulation environments.</p>
+                <p><span class="tag">Active Learning</span> <span class="tag">Molecular Dynamics</span></p>
+            </div>
+
+            <div class="card">
+                <h3><a href="https://github.com/nomad-coe/nomad-lab-base" target="_blank">NOMAD Repository</a></h3>
+                <p>The NOMAD Lab provides a vast repository of computational materials science data, including benchmarks for various physical properties across many simulation codes.</p>
+                <p><span class="tag">Open Data</span> <span class="tag">FAIR Principles</span></p>
+            </div>
+        </section>
+
+        <section id="benchmark-metrics" style="margin-top: 3rem;">
+            <h2>Evaluation Metrics</h2>
+            <p>Common metrics used in these benchmarks include:</p>
+            <ul>
+                <li><strong>RMSE Energy:</strong> Root Mean Square Error in energy prediction (meV/atom).</li>
+                <li><strong>RMSE Forces:</strong> Root Mean Square Error in force components (eV/Å).</li>
+                <li><strong>Elastic Constants:</strong> Comparison of predicted C<sub>ij</sub> values against DFT benchmarks.</li>
+                <li><strong>Phonon Spectra:</strong> Accuracy in predicting vibrational properties and stability.</li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>
