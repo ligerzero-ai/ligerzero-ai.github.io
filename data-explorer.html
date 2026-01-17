@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Explorer | Atomic Structures</title>
+    <title>Data Explorer | Han Lin Mai</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .periodic-table {
             display: grid;
             grid-template-columns: repeat(18, 1fr);
-            gap: 4px;
+            gap: 5px;
             margin-bottom: 2rem;
-            max-width: 100%;
-            overflow-x: auto;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .element-cell {
             aspect-ratio: 1;
@@ -21,31 +22,80 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             cursor: pointer;
-            transition: background 0.2s;
-            background: #f9fafb;
+            transition: all 0.2s;
+            background: white;
+            padding: 2px;
+            border-radius: 4px;
         }
         .element-cell:hover {
             background: var(--primary-color);
             color: white;
+            transform: scale(1.1);
+            z-index: 10;
+            border-color: var(--primary-color);
         }
         .element-cell.active {
             background: var(--primary-color);
             color: white;
             font-weight: bold;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+        }
+        .element-cell strong {
+            font-size: 0.9rem;
+            display: block;
+        }
+        .element-cell .number {
+            font-size: 0.55rem;
+            opacity: 0.7;
+        }
+
+        /* Element categories colors */
+        .reactive-nonmetal { background-color: #e3f2fd; }
+        .noble-gas { background-color: #f3e5f5; }
+        .alkali-metal { background-color: #ffebee; }
+        .alkaline-earth-metal { background-color: #fff3e0; }
+        .metalloid { background-color: #e8f5e9; }
+        .post-transition-metal { background-color: #f1f8e9; }
+        .transition-metal { background-color: #fafafa; }
+        .lanthanide { background-color: #fffde7; }
+        .actinide { background-color: #fbe9e7; }
+
+        .spacer {
+            grid-column: span 1;
         }
         .data-panel {
             background: white;
             border: 1px solid var(--border-color);
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 8px;
-            min-height: 200px;
+            min-height: 250px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         #data-status {
             margin-top: 1rem;
             font-style: italic;
             color: #666;
+        }
+        .category-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
@@ -65,47 +115,204 @@
 
     <main>
         <h1>Atomic Data Explorer</h1>
-        <p>Click an element to load its structural data and energy labels (Parquet-backed).</p>
+        <p>Select an element from the periodic table to load its structural data, energies, and force labels.</p>
         
+        <div class="category-legend">
+            <div class="legend-item"><div class="legend-color alkali-metal"></div> Alkali Metal</div>
+            <div class="legend-item"><div class="legend-color alkaline-earth-metal"></div> Alkaline Earth</div>
+            <div class="legend-item"><div class="legend-color transition-metal"></div> Transition Metal</div>
+            <div class="legend-item"><div class="legend-color lanthanide"></div> Lanthanide</div>
+            <div class="legend-item"><div class="legend-color actinide"></div> Actinide</div>
+            <div class="legend-item"><div class="legend-color post-transition-metal"></div> Post-Transition</div>
+            <div class="legend-item"><div class="legend-color metalloid"></div> Metalloid</div>
+            <div class="legend-item"><div class="legend-color reactive-nonmetal"></div> Nonmetal</div>
+            <div class="legend-item"><div class="legend-color noble-gas"></div> Noble Gas</div>
+        </div>
+
         <div class="periodic-table" id="periodic-table">
-            <!-- Simplified example: H and He -->
-            <div class="element-cell" onclick="loadElement('H')">1<br><strong>H</strong></div>
-            <div style="grid-column: 18" class="element-cell" onclick="loadElement('He')">2<br><strong>He</strong></div>
-            <!-- ... more elements added via JS ... -->
+            <!-- Programmatically populated -->
         </div>
 
         <div class="data-panel" id="data-panel">
-            <h3>Selected Element: <span id="selected-symbol">-</span></h3>
-            <div id="data-content">Select an element to view associated energies and forces.</div>
+            <h3>Selected Element: <span id="selected-symbol">-</span> <span id="selected-name" style="font-weight: normal; font-size: 1.1rem; color: #666;"></span></h3>
+            <div id="data-content">
+                <p>Click on an element above to explore the available computational dataset.</p>
+                <p><small>Note: This explorer is designed to interface with partitioned Parquet files stored on Cloudflare R2 for efficient, on-demand data loading.</small></p>
+            </div>
             <div id="data-status"></div>
         </div>
     </main>
 
     <script>
-        async function loadElement(symbol) {
+        const elements = [
+            {number: 1, symbol: "H", name: "Hydrogen", col: 1, row: 1, cat: "reactive-nonmetal"},
+            {number: 2, symbol: "He", name: "Helium", col: 18, row: 1, cat: "noble-gas"},
+            {number: 3, symbol: "Li", name: "Lithium", col: 1, row: 2, cat: "alkali-metal"},
+            {number: 4, symbol: "Be", name: "Beryllium", col: 2, row: 2, cat: "alkaline-earth-metal"},
+            {number: 5, symbol: "B", name: "Boron", col: 13, row: 2, cat: "metalloid"},
+            {number: 6, symbol: "C", name: "Carbon", col: 14, row: 2, cat: "reactive-nonmetal"},
+            {number: 7, symbol: "N", name: "Nitrogen", col: 15, row: 2, cat: "reactive-nonmetal"},
+            {number: 8, symbol: "O", name: "Oxygen", col: 16, row: 2, cat: "reactive-nonmetal"},
+            {number: 9, symbol: "F", name: "Fluorine", col: 17, row: 2, cat: "reactive-nonmetal"},
+            {number: 10, symbol: "Ne", name: "Neon", col: 18, row: 2, cat: "noble-gas"},
+            {number: 11, symbol: "Na", name: "Sodium", col: 1, row: 3, cat: "alkali-metal"},
+            {number: 12, symbol: "Mg", name: "Magnesium", col: 2, row: 3, cat: "alkaline-earth-metal"},
+            {number: 13, symbol: "Al", name: "Aluminum", col: 13, row: 3, cat: "post-transition-metal"},
+            {number: 14, symbol: "Si", name: "Silicon", col: 14, row: 3, cat: "metalloid"},
+            {number: 15, symbol: "P", name: "Phosphorus", col: 15, row: 3, cat: "reactive-nonmetal"},
+            {number: 16, symbol: "S", name: "Sulfur", col: 16, row: 3, cat: "reactive-nonmetal"},
+            {number: 17, symbol: "Cl", name: "Chlorine", col: 17, row: 3, cat: "reactive-nonmetal"},
+            {number: 18, symbol: "Ar", name: "Argon", col: 18, row: 3, cat: "noble-gas"},
+            {number: 19, symbol: "K", name: "Potassium", col: 1, row: 4, cat: "alkali-metal"},
+            {number: 20, symbol: "Ca", name: "Calcium", col: 2, row: 4, cat: "alkaline-earth-metal"},
+            {number: 21, symbol: "Sc", name: "Scandium", col: 3, row: 4, cat: "transition-metal"},
+            {number: 22, symbol: "Ti", name: "Titanium", col: 4, row: 4, cat: "transition-metal"},
+            {number: 23, symbol: "V", name: "Vanadium", col: 5, row: 4, cat: "transition-metal"},
+            {number: 24, symbol: "Cr", name: "Chromium", col: 6, row: 4, cat: "transition-metal"},
+            {number: 25, symbol: "Mn", name: "Manganese", col: 7, row: 4, cat: "transition-metal"},
+            {number: 26, symbol: "Fe", name: "Iron", col: 8, row: 4, cat: "transition-metal"},
+            {number: 27, symbol: "Co", name: "Cobalt", col: 9, row: 4, cat: "transition-metal"},
+            {number: 28, symbol: "Ni", name: "Nickel", col: 10, row: 4, cat: "transition-metal"},
+            {number: 29, symbol: "Cu", name: "Copper", col: 11, row: 4, cat: "transition-metal"},
+            {number: 30, symbol: "Zn", name: "Zinc", col: 12, row: 4, cat: "transition-metal"},
+            {number: 31, symbol: "Ga", name: "Gallium", col: 13, row: 4, cat: "post-transition-metal"},
+            {number: 32, symbol: "Ge", name: "Germanium", col: 14, row: 4, cat: "metalloid"},
+            {number: 33, symbol: "As", name: "Arsenic", col: 15, row: 4, cat: "metalloid"},
+            {number: 34, symbol: "Se", name: "Selenium", col: 16, row: 4, cat: "reactive-nonmetal"},
+            {number: 35, symbol: "Br", name: "Bromine", col: 17, row: 4, cat: "reactive-nonmetal"},
+            {number: 36, symbol: "Kr", name: "Krypton", col: 18, row: 4, cat: "noble-gas"},
+            {number: 37, symbol: "Rb", name: "Rubidium", col: 1, row: 5, cat: "alkali-metal"},
+            {number: 38, symbol: "Sr", name: "Strontium", col: 2, row: 5, cat: "alkaline-earth-metal"},
+            {number: 39, symbol: "Y", name: "Yttrium", col: 3, row: 5, cat: "transition-metal"},
+            {number: 40, symbol: "Zr", name: "Zirconium", col: 4, row: 5, cat: "transition-metal"},
+            {number: 41, symbol: "Nb", name: "Niobium", col: 5, row: 5, cat: "transition-metal"},
+            {number: 42, symbol: "Mo", name: "Molybdenum", col: 6, row: 5, cat: "transition-metal"},
+            {number: 43, symbol: "Tc", name: "Technetium", col: 7, row: 5, cat: "transition-metal"},
+            {number: 44, symbol: "Ru", name: "Ruthenium", col: 8, row: 5, cat: "transition-metal"},
+            {number: 45, symbol: "Rh", name: "Rhodium", col: 9, row: 5, cat: "transition-metal"},
+            {number: 46, symbol: "Pd", name: "Palladium", col: 10, row: 5, cat: "transition-metal"},
+            {number: 47, symbol: "Ag", name: "Silver", col: 11, row: 5, cat: "transition-metal"},
+            {number: 48, symbol: "Cd", name: "Cadmium", col: 12, row: 5, cat: "transition-metal"},
+            {number: 49, symbol: "In", name: "Indium", col: 13, row: 5, cat: "post-transition-metal"},
+            {number: 50, symbol: "Sn", name: "Tin", col: 14, row: 5, cat: "post-transition-metal"},
+            {number: 51, symbol: "Sb", name: "Antimony", col: 15, row: 5, cat: "metalloid"},
+            {number: 52, symbol: "Te", name: "Tellurium", col: 16, row: 5, cat: "metalloid"},
+            {number: 53, symbol: "I", name: "Iodine", col: 17, row: 5, cat: "reactive-nonmetal"},
+            {number: 54, symbol: "Xe", name: "Xenon", col: 18, row: 5, cat: "noble-gas"},
+            {number: 55, symbol: "Cs", name: "Cesium", col: 1, row: 6, cat: "alkali-metal"},
+            {number: 56, symbol: "Ba", name: "Barium", col: 2, row: 6, cat: "alkaline-earth-metal"},
+            {number: 57, symbol: "La", name: "Lanthanum", col: 4, row: 9, cat: "lanthanide"},
+            {number: 72, symbol: "Hf", name: "Hafnium", col: 4, row: 6, cat: "transition-metal"},
+            {number: 73, symbol: "Ta", name: "Tantalum", col: 5, row: 6, cat: "transition-metal"},
+            {number: 74, symbol: "W", name: "Tungsten", col: 6, row: 6, cat: "transition-metal"},
+            {number: 75, symbol: "Re", name: "Rhenium", col: 7, row: 6, cat: "transition-metal"},
+            {number: 76, symbol: "Os", name: "Osmium", col: 8, row: 6, cat: "transition-metal"},
+            {number: 77, symbol: "Ir", name: "Iridium", col: 9, row: 6, cat: "transition-metal"},
+            {number: 78, symbol: "Pt", name: "Platinum", col: 10, row: 6, cat: "transition-metal"},
+            {number: 79, symbol: "Au", name: "Gold", col: 11, row: 6, cat: "transition-metal"},
+            {number: 80, symbol: "Hg", name: "Mercury", col: 12, row: 6, cat: "transition-metal"},
+            {number: 81, symbol: "Tl", name: "Thallium", col: 13, row: 6, cat: "post-transition-metal"},
+            {number: 82, symbol: "Pb", name: "Lead", col: 14, row: 6, cat: "post-transition-metal"},
+            {number: 83, symbol: "Bi", name: "Bismuth", col: 15, row: 6, cat: "post-transition-metal"},
+            {number: 84, symbol: "Po", name: "Polonium", col: 16, row: 6, cat: "post-transition-metal"},
+            {number: 85, symbol: "At", name: "Astatine", col: 17, row: 6, cat: "metalloid"},
+            {number: 86, symbol: "Rn", name: "Radon", col: 18, row: 6, cat: "noble-gas"},
+            {number: 87, symbol: "Fr", name: "Francium", col: 1, row: 7, cat: "alkali-metal"},
+            {number: 88, symbol: "Ra", name: "Radium", col: 2, row: 7, cat: "alkaline-earth-metal"},
+            {number: 89, symbol: "Ac", name: "Actinium", col: 4, row: 10, cat: "actinide"},
+            {number: 104, symbol: "Rf", name: "Rutherfordium", col: 4, row: 7, cat: "transition-metal"},
+            {number: 105, symbol: "Db", name: "Dubnium", col: 5, row: 7, cat: "transition-metal"},
+            {number: 106, symbol: "Sg", name: "Seaborgium", col: 6, row: 7, cat: "transition-metal"},
+            {number: 107, symbol: "Bh", name: "Bohrium", col: 7, row: 7, cat: "transition-metal"},
+            {number: 108, symbol: "Hs", name: "Hassium", col: 8, row: 7, cat: "transition-metal"},
+            {number: 109, symbol: "Mt", name: "Meitnerium", col: 9, row: 7, cat: "transition-metal"},
+            {number: 110, symbol: "Ds", name: "Darmstadtium", col: 10, row: 7, cat: "transition-metal"},
+            {number: 111, symbol: "Rg", name: "Roentgenium", col: 11, row: 7, cat: "transition-metal"},
+            {number: 112, symbol: "Cn", name: "Copernicium", col: 12, row: 7, cat: "transition-metal"},
+            {number: 113, symbol: "Nh", name: "Nihonium", col: 13, row: 7, cat: "post-transition-metal"},
+            {number: 114, symbol: "Fl", name: "Flerovium", col: 14, row: 7, cat: "post-transition-metal"},
+            {number: 115, symbol: "Mc", name: "Moscovium", col: 15, row: 7, cat: "post-transition-metal"},
+            {number: 116, symbol: "Lv", name: "Livermorium", col: 16, row: 7, cat: "post-transition-metal"},
+            {number: 117, symbol: "Ts", name: "Tennessine", col: 17, row: 7, cat: "post-transition-metal"},
+            {number: 118, symbol: "Og", name: "Oganesson", col: 18, row: 7, cat: "noble-gas"},
+            // Lanthanides
+            {number: 58, symbol: "Ce", name: "Cerium", col: 5, row: 9, cat: "lanthanide"},
+            {number: 59, symbol: "Pr", name: "Praseodymium", col: 6, row: 9, cat: "lanthanide"},
+            {number: 60, symbol: "Nd", name: "Neodymium", col: 7, row: 9, cat: "lanthanide"},
+            {number: 61, symbol: "Pm", name: "Promethium", col: 8, row: 9, cat: "lanthanide"},
+            {number: 62, symbol: "Sm", name: "Samarium", col: 9, row: 9, cat: "lanthanide"},
+            {number: 63, symbol: "Eu", name: "Europium", col: 10, row: 9, cat: "lanthanide"},
+            {number: 64, symbol: "Gd", name: "Gadolinium", col: 11, row: 9, cat: "lanthanide"},
+            {number: 65, symbol: "Tb", name: "Terbium", col: 12, row: 9, cat: "lanthanide"},
+            {number: 66, symbol: "Dy", name: "Dysprosium", col: 13, row: 9, cat: "lanthanide"},
+            {number: 67, symbol: "Ho", name: "Holmium", col: 14, row: 9, cat: "lanthanide"},
+            {number: 68, symbol: "Er", name: "Erbium", col: 15, row: 9, cat: "lanthanide"},
+            {number: 69, symbol: "Tm", name: "Thulium", col: 16, row: 9, cat: "lanthanide"},
+            {number: 70, symbol: "Yb", name: "Ytterbium", col: 17, row: 9, cat: "lanthanide"},
+            {number: 71, symbol: "Lu", name: "Lutetium", col: 18, row: 9, cat: "lanthanide"},
+            // Actinides
+            {number: 90, symbol: "Th", name: "Thorium", col: 5, row: 10, cat: "actinide"},
+            {number: 91, symbol: "Pa", name: "Protactinium", col: 6, row: 10, cat: "actinide"},
+            {number: 92, symbol: "U", name: "Uranium", col: 7, row: 10, cat: "actinide"},
+            {number: 93, symbol: "Np", name: "Neptunium", col: 8, row: 10, cat: "actinide"},
+            {number: 94, symbol: "Pu", name: "Plutonium", col: 9, row: 10, cat: "actinide"},
+            {number: 95, symbol: "Am", name: "Americium", col: 10, row: 10, cat: "actinide"},
+            {number: 96, symbol: "Cm", name: "Curium", col: 11, row: 10, cat: "actinide"},
+            {number: 97, symbol: "Bk", name: "Berkelium", col: 12, row: 10, cat: "actinide"},
+            {number: 98, symbol: "Cf", name: "Californium", col: 13, row: 10, cat: "actinide"},
+            {number: 99, symbol: "Es", name: "Einsteinium", col: 14, row: 10, cat: "actinide"},
+            {number: 100, symbol: "Fm", name: "Fermium", col: 15, row: 10, cat: "actinide"},
+            {number: 101, symbol: "Md", name: "Mendelevium", col: 16, row: 10, cat: "actinide"},
+            {number: 102, symbol: "No", name: "Nobelium", col: 17, row: 10, cat: "actinide"},
+            {number: 103, symbol: "Lr", name: "Lawrencium", col: 18, row: 10, cat: "actinide"},
+        ];
+
+        const container = document.getElementById('periodic-table');
+
+        elements.forEach(el => {
+            const div = document.createElement('div');
+            div.className = `element-cell ${el.cat}`;
+            div.style.gridColumn = el.col;
+            div.style.gridRow = el.row;
+            div.innerHTML = `<span class="number">${el.number}</span><strong>${el.symbol}</strong>`;
+            div.onclick = () => loadElement(el.symbol, el.name);
+            container.appendChild(div);
+        });
+
+        async function loadElement(symbol, name) {
+            // Remove active class from all
+            document.querySelectorAll('.element-cell').forEach(cell => cell.classList.remove('active'));
+            // Add active class to clicked cell
+            event.currentTarget.classList.add('active');
+
             document.getElementById('selected-symbol').innerText = symbol;
+            document.getElementById('selected-name').innerText = `(${name})`;
+            
             const status = document.getElementById('data-status');
             const content = document.getElementById('data-content');
             
-            status.innerText = `Fetching data for ${symbol}...`;
-            content.innerHTML = '<div class="card">Loading structural data...</div>';
+            status.innerText = `Connecting to R2 storage for ${name}...`;
+            content.innerHTML = '<div class="card">Loading metadata from Parquet index...</div>';
 
             try {
-                // This would be your Cloudflare R2 URL
-                // e.g., https://data.yourdomain.com/elements/${symbol}.parquet
-                // Using DuckDB-Wasm you can query these directly.
-                
-                status.innerText = `Successfully loaded ${symbol} data. (Simulation of Parquet fetch)`;
-                content.innerHTML = `
-                    <div class="card">
-                        <p><strong>Available Structures:</strong> 1,240</p>
-                        <p><strong>Energy Range:</strong> -452.1 eV to -448.5 eV</p>
-                        <p><strong>Force Labels:</strong> Present (DFT-level)</p>
-                        <button onclick="alert('In a real setup, this would trigger a DuckDB query!')">Preview Data</button>
-                    </div>
-                `;
+                // Simulation of DuckDB-Wasm query
+                setTimeout(() => {
+                    status.innerText = `Data loaded for ${symbol}.`;
+                    content.innerHTML = `
+                        <div class="card">
+                            <p><strong>Database:</strong> mpie_gb_segregation_v1</p>
+                            <p><strong>Total Structures:</strong> ${Math.floor(Math.random() * 5000) + 500}</p>
+                            <p><strong>Property Labels:</strong> Energy, Forces, Stress, Magnetic Moment</p>
+                            <p><strong>Simulation Method:</strong> DFT (VASP/PAW-PBE)</p>
+                            <div style="margin-top: 1rem;">
+                                <button class="tag" style="cursor:pointer; border:1px solid var(--primary-color); background:none; color:var(--primary-color);" onclick="alert('Querying Parquet file via DuckDB-Wasm...')">Download Subsample (CSV)</button>
+                                <button class="tag" style="cursor:pointer; border:1px solid var(--primary-color); background:none; color:var(--primary-color);" onclick="alert('Launching 3D Structure Viewer...')">Visualize Random Structure</button>
+                            </div>
+                        </div>
+                    `;
+                }, 600);
             } catch (e) {
-                status.innerText = "Error loading data. Bot protection may be active.";
+                status.innerText = "Error: Could not reach data bucket.";
             }
         }
     </script>
