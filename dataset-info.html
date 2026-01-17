@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datasets Overview | Han Lin Mai</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dataset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 2rem;
+        }
+        .dataset-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .dataset-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .dataset-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .assyst-section {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary-color);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .param-table th, .param-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .param-table th {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Han Lin Mai</h1>
+        <ul>
+            <li><a href="index.html">Introduction</a></li>
+            <li><a href="cv.html">CV</a></li>
+            <li><a href="publications.html">Publications</a></li>
+            <li><a href="presentations.html">Presentations</a></li>
+            <li><a href="youtube.html">YouTube Videos</a></li>
+            <li><a href="github.html">GitHub Repositories</a></li>
+            <li><a href="dataset-info.html" class="active">Datasets</a></li>
+            <li><a href="data-explorer.html">Data Explorer</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h1>Computational Materials Datasets</h1>
+        <p>This page provides an overview of the various datasets I have developed and maintained, ranging from grain boundary segregation studies to high-throughput unary structural databases.</p>
+
+        <section class="assyst-section">
+            <h2>The ASSYST Methodology</h2>
+            <p><strong>Active-learning-based Systematic Structural Search Tool (ASSYST)</strong></p>
+            <p>
+                Based on the work published in <a href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.107.104103" target="_blank"><em>Phys. Rev. B 107, 104103 (2023)</em></a>, 
+                ASSYST is a methodology designed for the efficient and automated discovery of stable and metastable structural configurations in complex materials.
+            </p>
+            <h3>Abstract</h3>
+            <p><em>
+                "Determining the ground-state and metastable structures of materials is a fundamental challenge in materials science. We introduce the Active-learning-based Systematic Structural Search Tool (ASSYST), which combines systematic structural generation with active-learning-driven interatomic potentials to explore the vast configurational space of materials. By iteratively refining the potential and the structural candidates, ASSYST enables the identification of low-energy configurations with a fraction of the computational cost of traditional first-principles methods..."
+            </em></p>
+        </section>
+
+        <h2>Available Datasets</h2>
+        <div class="dataset-grid">
+            <div class="dataset-card">
+                <h3>Ni-X GB Segregation + Cohesion</h3>
+                <p>A comprehensive dataset exploring the segregation of various alloying elements (X) to Nickel grain boundaries and their subsequent impact on grain boundary cohesion.</p>
+                <p><small>Method: DFT (VASP)</small></p>
+            </div>
+
+            <div class="dataset-card">
+                <h3>Fe-X GB Segregation + Cohesion</h3>
+                <p>High-throughput data for solute segregation in Ferritic Iron grain boundaries. Focuses on the competition between different solutes and their role in embrittlement.</p>
+                <p><small>Method: DFT (VASP)</small></p>
+            </div>
+
+            <div class="dataset-card">
+                <h3>Ni-X ASSYST Dataset</h3>
+                <p>Dataset generated using the ASSYST framework for Ni-based systems, capturing a wide range of structural motifs and configurations for potential development.</p>
+                <p><small>Method: ASSYST + DFT</small></p>
+            </div>
+
+            <div class="dataset-card">
+                <h3>Fe-X ASSYST Dataset</h3>
+                <p>Exploration of the Fe-X configurational space using the ASSYST methodology, providing a rich set of structures for complex Fe-based alloys.</p>
+                <p><small>Method: ASSYST + DFT</small></p>
+            </div>
+
+            <div class="dataset-card">
+                <h3>Unary Periodic Table Dataset</h3>
+                <p>A massive collection of structural data for unary systems across the entire periodic table, designed for benchmarking and general-purpose potential training.</p>
+                <p><small>Coverage: Elements 1-118</small></p>
+            </div>
+        </div>
+
+        <section id="calculation-parameters" style="margin-top: 3rem;">
+            <h2>Calculation Parameters</h2>
+            <p>Unless otherwise specified, the following default parameters were used for the DFT calculations within these datasets:</p>
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Setting</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Code</td>
+                        <td>VASP / PAW-PBE</td>
+                    </tr>
+                    <tr>
+                        <td>Encut</td>
+                        <td>Placeholder: 520 eV</td>
+                    </tr>
+                    <tr>
+                        <td>K-mesh</td>
+                        <td>Placeholder: 0.15 Å⁻¹</td>
+                    </tr>
+                    <tr>
+                        <td>Relaxation</td>
+                        <td>Fully relaxed (Ionic + Cell)</td>
+                    </tr>
+                    <tr>
+                        <td>Magnetism</td>
+                        <td>Spin-polarized (Initial FM/AFM)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div style="margin-top: 3rem;">
+            <a href="data-explorer.html" class="tag">← Back to Interactive Explorer</a>
+        </div>
+    </main>
+</body>
+</html>
