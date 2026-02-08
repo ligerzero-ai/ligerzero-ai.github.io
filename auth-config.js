@@ -17,7 +17,7 @@
 
 const AUTH_CONFIG = {
     // Replace with your GitHub OAuth App Client ID
-    clientId: 'YOUR_GITHUB_CLIENT_ID',
+    clientId: 'Ov23liWXYq8oX6q8VH4R',
 
     // The URL GitHub redirects to after authorization
     redirectUri: window.location.origin + '/callback.html',
@@ -36,7 +36,7 @@ const AUTH_CONFIG = {
     //
     // The proxy should accept POST { code } and return { access_token }.
     // See the README or oauth-proxy-worker.js for a Cloudflare Worker template.
-    tokenProxyUrl: 'https://your-oauth-proxy.workers.dev/exchange',
+    tokenProxyUrl: 'https://ligerzero-oauth-proxy.ligerzero.workers.dev/exchange',
 
     // Pages that require authentication (relative paths)
     protectedPages: [
