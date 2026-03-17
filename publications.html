@@ -5,6 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publications | Han Lin Mai</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .card details {
+            margin-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.75rem;
+        }
+        .card details summary {
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .card details summary::-webkit-details-marker { display: none; }
+        .card details summary::before {
+            content: '+';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid var(--primary-color);
+            border-radius: 50%;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+        .card details[open] summary::before {
+            content: '\2212';
+            transform: rotate(180deg);
+        }
+        .card details .summary-content {
+            margin-top: 0.75rem;
+            padding-left: 1.75rem;
+            font-size: 0.9rem;
+            color: #4b5563;
+            line-height: 1.7;
+        }
+        .card details .summary-content ul {
+            margin: 0.5rem 0 0 0;
+            padding-left: 1.2rem;
+        }
+        .card details .summary-content li {
+            margin-bottom: 0.3rem;
+        }
+    </style>
     <script src="sidebar.js"></script>
     <script src="auth-config.js"></script>
     <script src="auth.js"></script>
@@ -16,12 +65,23 @@
         <section id="publications">
             <h1>Publications</h1>
             <p>A selection of my research papers. For a full list, please visit my <a href="https://scholar.google.com/citations?user=12VpovYAAAAJ&hl=en" target="_blank">Google Scholar profile</a>.</p>
-            
+
             <div class="card">
                 <h3><a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:_kc_bZDykSQC" target="_blank">Quantifying changes to solute segregation behaviour at interfaces in additively manufactured Ti-6Al-4V</a></h3>
                 <p>Breen, A.J., Davids, W.J., Chen, H., <strong>Mai, H.L.</strong>, Nomoto, K., Cui, X., Liao, X., Primig, S. and Ringer, S.P.</p>
                 <p><em>Acta Materialia, p. 121904 (2026)</em></p>
                 <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:_kc_bZDykSQC" target="_blank">View on Google Scholar →</a>
+                <details>
+                    <summary>Key Points</summary>
+                    <div class="summary-content">
+                        <ul>
+                            <li>Combines correlative transmission Kikuchi diffraction and atom probe tomography with first-principles DFT calculations to quantify Gibbsian interfacial excess at alpha/alpha grain boundaries in electron powder bed fusion Ti-6Al-4V</li>
+                            <li>DFT calculations on model grain boundaries confirmed the thermodynamic driving force for V and Fe enrichment and Al depletion at boundaries</li>
+                            <li>V segregation generally increased with boundary misorientation angle</li>
+                            <li>Good agreement between experimental APT observations and DFT predictions highlights the influence of local defect structures on segregation behaviour</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
 
             <div class="card">
@@ -29,13 +89,34 @@
                 <p><strong>Mai, H.L.</strong>, Cui, X.Y., Hickel, T., Neugebauer, J. and Ringer, S.</p>
                 <p><em>Acta Materialia, 121288 (2025)</em></p>
                 <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:YOwf2qJgpHMC" target="_blank">View on Google Scholar →</a>
+                <details>
+                    <summary>Key Points</summary>
+                    <div class="summary-content">
+                        <ul>
+                            <li>Comprehensive DFT evaluation of segregation energies and cohesive effects for all elements from H to U (Z = 1-92) across substitutional sites in six model ferritic iron grain boundaries</li>
+                            <li>Cohesive effects assessed using both DDEC6 bond-order analysis and modified Rice-Thomson-Wang theory of interfacial cohesion</li>
+                            <li>Segregant effects on GB cohesion vary drastically as a function of site character; accurate predictions require thermodynamic averaging across energy distributions</li>
+                            <li>All data publicly available on GitHub for community use</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
 
             <div class="card">
                 <h3><a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:ULOm3_A8WrAC" target="_blank">Advancing Digital Transformation in Material Science: The Role of Workflows Within the MaterialDigital Initiative</a></h3>
-                <p>Bekemeier, S., Caldeira Rêgo, C.R., <strong>Mai, H.L.</strong>, Saikia, U., Waseda, O., Apel, M., ... and Schaarschmidt, J.</p>
+                <p>Bekemeier, S., Caldeira R&ecirc;go, C.R., <strong>Mai, H.L.</strong>, Saikia, U., Waseda, O., Apel, M., ... and Schaarschmidt, J.</p>
                 <p><em>Advanced Engineering Materials, 2402149 (2025)</em></p>
                 <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:ULOm3_A8WrAC" target="_blank">View on Google Scholar →</a>
+                <details>
+                    <summary>Key Points</summary>
+                    <div class="summary-content">
+                        <ul>
+                            <li>Discusses the role of scientific workflows within the Platform MaterialDigital (PMD) initiative for driving digital transformation in materials science</li>
+                            <li>Promotes FAIR (findable, accessible, interoperable, reusable) principles for computational and experimental workflows</li>
+                            <li>Introduces the Workflow Store as a central tool for disseminating and sharing workflows, supporting SimStack and pyiron frameworks</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
 
             <div class="card">
@@ -43,6 +124,16 @@
                 <p><strong>Mai, H.L.</strong>, Cui, X.Y., Scheiber, D., Romaner, L. and Ringer, S.P.</p>
                 <p><em>Acta Materialia, 250, 118850 (2023)</em></p>
                 <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:KlAtU1dfN6UC" target="_blank">View on Google Scholar →</a>
+                <details>
+                    <summary>Key Points</summary>
+                    <div class="summary-content">
+                        <ul>
+                            <li>DFT and kinetic simulations of P co-segregation with ten transition metals (Co, Cr, Cu, Mn, Mo, Ni, Nb, Ti, V, W) at ferritic iron grain boundaries</li>
+                            <li>Phosphorus alone is unlikely to cause intergranular fracture through weakened interfacial bonding</li>
+                            <li>The interplay between P and TM co-segregation governs embrittlement behaviour, challenging the conventional view that P is the sole driver of temper embrittlement in steels</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
 
             <div class="card">
@@ -50,6 +141,17 @@
                 <p><strong>Mai, H.L.</strong>, Cui, X.Y., Scheiber, D., Romaner, L. and Ringer, S.P.</p>
                 <p><em>Acta Materialia, 231, 117902 (2022)</em></p>
                 <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:kNdYIx-mwKoC" target="_blank">View on Google Scholar →</a>
+                <details>
+                    <summary>Key Points</summary>
+                    <div class="summary-content">
+                        <ul>
+                            <li>Systematic DFT study with brute-force configurational analysis of ten TM segregation and co-segregation at ferritic iron grain boundaries</li>
+                            <li>Introduced a novel quantitative method for assessing cohesion effects through the DDEC6 bond-order framework</li>
+                            <li>Differing GB characters change not only TM segregation behaviours but also their effects on cohesion</li>
+                            <li>Combined multi-element segregation effects differ substantially from the sum of individual contributions</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
 
             <div class="card">
@@ -57,6 +159,17 @@
                 <p><strong>Mai, H.L.</strong>, Cui, X.Y., Scheiber, D., Romaner, L. and Ringer, S.P.</p>
                 <p><em>Materials & Design, 212, 110283 (2021)</em></p>
                 <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:3fE2CSJIrl8C" target="_blank">View on Google Scholar →</a>
+                <details>
+                    <summary>Key Points</summary>
+                    <div class="summary-content">
+                        <ul>
+                            <li>DFT study of hydrogen segregation, accumulation, and cohesion effects at three model Ni grain boundaries: &Sigma;3(111), &Sigma;5(120), and &Sigma;11(110)</li>
+                            <li>GB character controls vulnerability to hydrogen embrittlement; low-energy coherent GBs minimise H accumulation</li>
+                            <li>Interfacial cohesion diminishes by 6.7&ndash;37.5% depending on H accumulation levels</li>
+                            <li>Chemical bond-order approach enabled quantitative determination of fracture paths arising from H embrittlement</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
 
             <div class="card">
@@ -64,6 +177,16 @@
                 <p><strong>Mai, H.L.</strong>, Cui, X.Y. and Ringer, S.P.</p>
                 <p><em>Physical Review Materials, 4(8), 086003 (2020)</em></p>
                 <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:MXK_kJrjxJIC" target="_blank">View on Google Scholar →</a>
+                <details>
+                    <summary>Key Points</summary>
+                    <div class="summary-content">
+                        <ul>
+                            <li>DFT tensile simulations of &lt;111&gt; ultrathin gold nanowires (~1&ndash;1.6 nm diameter) as a function of size, morphology (rectangular/hexagonal prism), and ultrahigh-density twin boundaries</li>
+                            <li>Remarkable range of Young's modulus (60&ndash;158 GPa) and ultimate tensile strengths (3.7&ndash;14.0 GPa) explains the scatter observed in experiments as an intrinsic feature</li>
+                            <li>Ultrahigh twin boundary density universally enhanced strength across all sizes and morphologies, attributed to suppression of anisotropic phenomena and slip plane disruption</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
 
             <div class="card">
@@ -71,6 +194,16 @@
                 <p><strong>Mai, H.L.</strong>, Cui, X.Y., Stampfl, C. and Ringer, S.P.</p>
                 <p><em>Applied Physics Letters, 113(7), 073103 (2018)</em></p>
                 <a href="https://scholar.google.com/citations?view_op=view_citation&hl=en&user=12VpovYAAAAJ&citation_for_view=12VpovYAAAAJ:_FxGoFyzp5QC" target="_blank">View on Google Scholar →</a>
+                <details>
+                    <summary>Key Points</summary>
+                    <div class="summary-content">
+                        <ul>
+                            <li>DFT study of electric-field-mediated reduction of oxygen and hydroxyl groups from pristine and defective graphene sheets with single and double vacancies</li>
+                            <li>Determined critical electric field strengths required for progressive and selective removal of different functional groups</li>
+                            <li>Vacancy defects significantly inhibit the effectiveness of electric fields for reducing O and OH groups, due to complex interactions between functional groups and vacancy edge atoms</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
         </section>
     </main>
