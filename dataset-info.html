@@ -61,15 +61,20 @@
 
         <section class="assyst-section">
             <h2>The ASSYST Methodology</h2>
-            <p><strong>Active-learning-based Systematic Structural Search Tool (ASSYST)</strong></p>
+            <p><strong>Automated Small SYmmetric Structure Training (ASSYST)</strong></p>
             <p>
-                Based on the work published in <a href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.107.104103" target="_blank"><em>Phys. Rev. B 107, 104103 (2023)</em></a>, 
-                ASSYST is a methodology designed for the efficient and automated discovery of stable and metastable structural configurations in complex materials.
+                Based on the work by Poul, Huber &amp; Neugebauer published in
+                <a href="https://doi.org/10.1038/s41524-025-01669-4" target="_blank"><em>npj Computational Materials 11, 174 (2025)</em></a>,
+                ASSYST is a strategy for generating unbiased and systematically extendable training data for machine learning interatomic potentials (MLIPs) for multicomponent alloys.
             </p>
-            <h3>Abstract</h3>
-            <p><em>
-                "Determining the ground-state and metastable structures of materials is a fundamental challenge in materials science. We introduce the Active-learning-based Systematic Structural Search Tool (ASSYST), which combines systematic structural generation with active-learning-driven interatomic potentials to explore the vast configurational space of materials. By iteratively refining the potential and the structural candidates, ASSYST enables the identification of low-energy configurations with a fraction of the computational cost of traditional first-principles methods..."
-            </em></p>
+            <h3>Key Features</h3>
+            <ul>
+                <li>Explores the full space of random crystal structures with space groups using PyXtal</li>
+                <li>Only small cells (~10 atoms) are needed for the DFT training set</li>
+                <li>Training set size and completeness can be systematically controlled with very few parameters</li>
+                <li>Generates training data in one shot without iterative active learning refinement</li>
+                <li>Validated on binary and ternary phases, random alloys, point and extended defects, and phase diagrams</li>
+            </ul>
         </section>
 
         <h2>Available Datasets</h2>

@@ -41,8 +41,7 @@ const AUTH_CONFIG = {
     // Pages that require authentication (relative paths)
     protectedPages: [
         'data-explorer.html',
-        'dataset-info.html',
-        'benchmarks.html'
+        'dataset-info.html'
     ],
 
     // Key used for localStorage

@@ -9,8 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Pages that require authentication (must match AUTH_CONFIG.protectedPages)
     const protectedPages = [
         'data-explorer.html',
-        'dataset-info.html',
-        'benchmarks.html'
+        'dataset-info.html'
     ];
 
     const isLoggedIn = !!localStorage.getItem('gh_auth_token');
@@ -23,8 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
         { name: "YouTube Videos", href: "youtube.html" },
         { name: "GitHub Repositories", href: "github.html" },
         { name: "Datasets", href: "dataset-info.html" },
-        { name: "Data Explorer", href: "data-explorer.html" },
-        { name: "Benchmarks", href: "benchmarks.html" }
+        { name: "Data Explorer", href: "data-explorer.html" }
     ];
 
     const lockIcon = '<svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" style="margin-left:4px;opacity:0.5;vertical-align:middle;"><path fill-rule="evenodd" d="M4 4v2h-.25A1.75 1.75 0 002 7.75v5.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-5.5A1.75 1.75 0 0012.25 6H12V4a4 4 0 10-8 0zm6.5 2V4a2.5 2.5 0 00-5 0v2h5zM12.25 7.5a.25.25 0 01.25.25v5.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-5.5a.25.25 0 01.25-.25h8.5z"></path></svg>';
