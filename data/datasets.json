@@ -6,7 +6,9 @@
     "method": "KP (DFT, VASP/PAW-PBE)",
     "description": "Unrelaxed substitutional solute segregation in Fe grain boundaries",
     "n_rows": 4897,
-    "n_elements": 91
+    "n_elements": 91,
+    "parquet_url": "https://pub-efcf512f83e94d82bd93fbeb2acbafd0.r2.dev/fe_x_gb_kp_unrelaxed.parquet",
+    "parquet_size_mb": 13.2
   },
   {
     "id": "fe_x_gb_kp_relaxed",
@@ -15,6 +17,8 @@
     "method": "KP (DFT, VASP/PAW-PBE)",
     "description": "Relaxed substitutional solute segregation in Fe grain boundaries",
     "n_rows": 4234,
-    "n_elements": 90
+    "n_elements": 90,
+    "parquet_url": "https://pub-efcf512f83e94d82bd93fbeb2acbafd0.r2.dev/fe_x_gb_kp_relaxed.parquet",
+    "parquet_size_mb": 24.4
   }
 ]

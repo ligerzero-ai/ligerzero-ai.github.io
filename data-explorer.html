@@ -568,11 +568,15 @@
                 // Table
                 html += `<div class="detail-table-wrap" id="table-${dsId}"></div>`;
 
-                // Download
-                html += `<div style="margin-top:0.5rem;">
+                // Download buttons
+                html += `<div style="margin-top:0.5rem;display:flex;gap:8px;flex-wrap:wrap;">
                     <button class="tag" style="cursor:pointer;border:1px solid var(--primary-color);background:none;color:var(--primary-color);"
-                        onclick="downloadDatasetCSV('${dsId}')">Download CSV</button>
-                </div>`;
+                        onclick="downloadDatasetCSV('${dsId}')">Download Filtered CSV</button>`;
+                if (dsMeta.parquet_url) {
+                    html += `<a href="${dsMeta.parquet_url}" class="tag" style="text-decoration:none;border:1px solid var(--primary-color);background:var(--primary-color);color:white;padding:3px 9px;border-radius:4px;font-size:0.78rem;"
+                        download>Download Full Parquet (${dsMeta.parquet_size_mb || '?'} MB)</a>`;
+                }
+                html += `</div>`;
 
                 html += `</div></div>`; // close body + section
             });
