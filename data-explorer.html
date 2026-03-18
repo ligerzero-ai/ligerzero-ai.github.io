@@ -16,6 +16,7 @@
             margin-right: auto;
         }
         .element-cell {
+            position: relative;
             aspect-ratio: 1;
             border: 1px solid var(--border-color);
             display: flex;
@@ -50,8 +51,32 @@
             font-size: 0.55rem;
             opacity: 0.7;
         }
+        .element-cell.has-data {
+            border: 2px solid var(--primary-color);
+        }
+        .element-cell.has-data::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--primary-color);
+        }
+        .element-cell.no-data {
+            opacity: 0.4;
+        }
+        .element-cell .ds-count {
+            position: absolute;
+            bottom: 1px;
+            right: 3px;
+            font-size: 0.45rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
 
-        /* Element categories colors */
+        /* Element categories */
         .reactive-nonmetal { background-color: #e3f2fd; }
         .noble-gas { background-color: #f3e5f5; }
         .alkali-metal { background-color: #ffebee; }
@@ -62,9 +87,8 @@
         .lanthanide { background-color: #fffde7; }
         .actinide { background-color: #fbe9e7; }
 
-        .spacer {
-            grid-column: span 1;
-        }
+        .spacer { grid-column: span 1; }
+
         .data-panel {
             background: white;
             border: 1px solid var(--border-color);
@@ -86,16 +110,137 @@
             font-size: 0.8rem;
             justify-content: center;
         }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
         .legend-color {
-            width: 15px;
-            height: 15px;
-            border-radius: 3px;
-            border: 1px solid #ddd;
+            width: 15px; height: 15px;
+            border-radius: 3px; border: 1px solid #ddd;
+        }
+
+        /* Dataset section cards */
+        .dataset-section {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .dataset-header {
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .dataset-header:hover { background: #f1f5f9; }
+        .dataset-header h4 { margin: 0; color: var(--primary-color); }
+        .dataset-header .meta {
+            font-size: 0.8rem; color: #666;
+        }
+        .dataset-header .toggle-arrow {
+            font-size: 1.2rem; transition: transform 0.2s;
+        }
+        .dataset-header .toggle-arrow.open { transform: rotate(90deg); }
+        .dataset-body { padding: 0 1.5rem 1rem; }
+        .dataset-body.collapsed { display: none; }
+
+        /* Summary stats grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 0.75rem 0;
+        }
+        .summary-stat {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        .summary-stat .value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .summary-stat .label {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        /* Detail table */
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        .detail-table th, .detail-table td {
+            text-align: left;
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .detail-table th {
+            background: #f3f4f6;
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+        .detail-table th:hover { background: #e5e7eb; }
+        .detail-table-wrap {
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-top: 0.5rem;
+        }
+
+        /* Filter bars */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 0.5rem 0;
+        }
+        .filter-bar button {
+            padding: 3px 9px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.78rem;
+        }
+        .filter-bar button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .filter-bar-label {
+            font-size: 0.78rem;
+            color: #666;
+            align-self: center;
+            margin-right: 4px;
+        }
+
+        /* Overall element summary at top */
+        .element-overview {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .element-overview .big-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+        .element-overview .big-label {
+            font-size: 0.8rem;
+            color: #666;
         }
     </style>
     <script src="sidebar.js"></script>
@@ -106,9 +251,9 @@
     <nav></nav>
 
     <main>
-        <h1>Atomic Data Explorer</h1>
-        <p>Select an element from the periodic table to load its structural data, energies, and force labels. For more details on the underlying datasets, visit the <a href="dataset-info.html">Datasets Overview</a> page.</p>
-        
+        <h1>Data Explorer</h1>
+        <p>Select an element to view all available computational data across datasets. Elements with data are highlighted. For dataset details, see the <a href="dataset-info.html">Datasets Overview</a>.</p>
+
         <div class="category-legend">
             <div class="legend-item"><div class="legend-color alkali-metal"></div> Alkali Metal</div>
             <div class="legend-item"><div class="legend-color alkaline-earth-metal"></div> Alkaline Earth</div>
@@ -121,21 +266,22 @@
             <div class="legend-item"><div class="legend-color noble-gas"></div> Noble Gas</div>
         </div>
 
-        <div class="periodic-table" id="periodic-table">
-            <!-- Programmatically populated -->
-        </div>
+        <div class="periodic-table" id="periodic-table"></div>
 
         <div class="data-panel" id="data-panel">
             <h3>Selected Element: <span id="selected-symbol">-</span> <span id="selected-name" style="font-weight: normal; font-size: 1.1rem; color: #666;"></span></h3>
             <div id="data-content">
-                <p>Click on an element above to explore the available computational dataset.</p>
-                <p><small>Note: This explorer is designed to interface with partitioned Parquet files stored on Cloudflare R2 for efficient, on-demand data loading.</small></p>
+                <p>Click on an element above to explore all available computational data.</p>
+                <p><small>Data spans multiple datasets including grain boundary segregation, cohesion, and more. Each dataset section can be expanded to view individual records, filtered and sorted.</small></p>
             </div>
             <div id="data-status"></div>
         </div>
     </main>
 
     <script>
+        let elementIndex = null;
+        let datasetsMeta = null;
+
         const elements = [
             {number: 1, symbol: "H", name: "Hydrogen", col: 1, row: 1, cat: "reactive-nonmetal"},
             {number: 2, symbol: "He", name: "Helium", col: 18, row: 1, cat: "noble-gas"},
@@ -259,53 +405,293 @@
             {number: 103, symbol: "Lr", name: "Lawrencium", col: 18, row: 10, cat: "actinide"},
         ];
 
+        // ── Init ──────────────────────────────────────────────────
         const container = document.getElementById('periodic-table');
 
-        elements.forEach(el => {
-            const div = document.createElement('div');
-            div.className = `element-cell ${el.cat}`;
-            div.style.gridColumn = el.col;
-            div.style.gridRow = el.row;
-            div.innerHTML = `<span class="number">${el.number}</span><strong>${el.symbol}</strong>`;
-            div.onclick = () => loadElement(el.symbol, el.name);
-            container.appendChild(div);
-        });
+        async function init() {
+            try {
+                const [indexResp, metaResp] = await Promise.all([
+                    fetch('data/element_index.json'),
+                    fetch('data/datasets.json'),
+                ]);
+                elementIndex = await indexResp.json();
+                datasetsMeta = await metaResp.json();
+                buildPeriodicTable();
+                const totalRecords = Object.values(elementIndex).reduce((s, e) => s + e.total_records, 0);
+                document.getElementById('data-status').innerText =
+                    `${Object.keys(elementIndex).length} elements with data across ${datasetsMeta.length} datasets (${totalRecords.toLocaleString()} total records).`;
+            } catch (e) {
+                console.error('Failed to load index:', e);
+                buildPeriodicTable();
+                document.getElementById('data-status').innerText = 'Warning: Could not load data index.';
+            }
+        }
+        init();
 
-        async function loadElement(symbol, name) {
-            // Remove active class from all
-            document.querySelectorAll('.element-cell').forEach(cell => cell.classList.remove('active'));
-            // Add active class to clicked cell
-            event.currentTarget.classList.add('active');
+        function buildPeriodicTable() {
+            container.innerHTML = '';
+            elements.forEach(el => {
+                const div = document.createElement('div');
+                div.className = `element-cell ${el.cat}`;
+                div.style.gridColumn = el.col;
+                div.style.gridRow = el.row;
+                div.dataset.symbol = el.symbol;
+
+                const info = elementIndex && elementIndex[el.symbol];
+                const hasData = !!info;
+
+                let inner = `<span class="number">${el.number}</span><strong>${el.symbol}</strong>`;
+                if (hasData) {
+                    div.classList.add('has-data');
+                    div.title = `${el.name}: ${info.total_records} records across ${info.n_datasets} dataset(s)`;
+                    if (info.n_datasets > 1) {
+                        inner += `<span class="ds-count">${info.n_datasets}</span>`;
+                    }
+                } else {
+                    div.classList.add('no-data');
+                    div.title = `${el.name}: no data available`;
+                }
+
+                div.innerHTML = inner;
+                div.onclick = (e) => loadElement(el.symbol, el.name, e.currentTarget);
+                container.appendChild(div);
+            });
+        }
+
+        // ── Load element ──────────────────────────────────────────
+        let currentRecords = null;
+        let currentSymbol = null;
+
+        // Per-dataset filter/sort state
+        const dsState = {};
+
+        async function loadElement(symbol, name, cellEl) {
+            document.querySelectorAll('.element-cell').forEach(c => c.classList.remove('active'));
+            if (cellEl) cellEl.classList.add('active');
 
             document.getElementById('selected-symbol').innerText = symbol;
             document.getElementById('selected-name').innerText = `(${name})`;
-            
+
             const status = document.getElementById('data-status');
             const content = document.getElementById('data-content');
-            
-            status.innerText = `Connecting to R2 storage for ${name}...`;
-            content.innerHTML = '<div class="card">Loading metadata from Parquet index...</div>';
+
+            const info = elementIndex && elementIndex[symbol];
+            if (!info) {
+                status.innerText = '';
+                content.innerHTML = `<p>No data available for <strong>${name}</strong> (${symbol}).</p>`;
+                return;
+            }
+
+            status.innerText = `Loading data for ${symbol}...`;
+            content.innerHTML = '';
 
             try {
-                // Simulation of DuckDB-Wasm query
-                setTimeout(() => {
-                    status.innerText = `Data loaded for ${symbol}.`;
-                    content.innerHTML = `
-                        <div class="card">
-                            <p><strong>Database:</strong> mpie_gb_segregation_v1</p>
-                            <p><strong>Total Structures:</strong> ${Math.floor(Math.random() * 5000) + 500}</p>
-                            <p><strong>Property Labels:</strong> Energy, Forces, Stress, Magnetic Moment</p>
-                            <p><strong>Simulation Method:</strong> DFT (VASP/PAW-PBE)</p>
-                            <div style="margin-top: 1rem;">
-                                <button class="tag" style="cursor:pointer; border:1px solid var(--primary-color); background:none; color:var(--primary-color);" onclick="alert('Querying Parquet file via DuckDB-Wasm...')">Download Subsample (CSV)</button>
-                                <button class="tag" style="cursor:pointer; border:1px solid var(--primary-color); background:none; color:var(--primary-color);" onclick="alert('Launching 3D Structure Viewer...')">Visualize Random Structure</button>
-                            </div>
-                        </div>
-                    `;
-                }, 600);
+                const resp = await fetch(`data/elements/${symbol}.json`);
+                const records = await resp.json();
+                currentRecords = records;
+                currentSymbol = symbol;
+                renderElement(symbol, name, info, records);
+                status.innerText = `Loaded ${records.length} records for ${symbol} across ${info.n_datasets} dataset(s).`;
             } catch (e) {
-                status.innerText = "Error: Could not reach data bucket.";
+                console.error('Failed to load element:', e);
+                status.innerText = `Error loading data for ${symbol}.`;
+                content.innerHTML = `<p>Failed to fetch data.</p>`;
             }
+        }
+
+        // ── Render element panel ──────────────────────────────────
+        function renderElement(symbol, name, info, records) {
+            const content = document.getElementById('data-content');
+
+            // Overview bar
+            let html = `<div class="element-overview">
+                <div><div class="big-number">${info.total_records}</div><div class="big-label">Total Records</div></div>
+                <div><div class="big-number">${info.n_datasets}</div><div class="big-label">Dataset(s)</div></div>
+            </div>`;
+
+            // Group records by dataset_id
+            const byDataset = {};
+            records.forEach(r => {
+                const dsId = r.dataset_id || 'unknown';
+                if (!byDataset[dsId]) byDataset[dsId] = [];
+                byDataset[dsId].push(r);
+            });
+
+            // Render a collapsible section per dataset
+            const dsIds = Object.keys(byDataset);
+            dsIds.forEach((dsId, i) => {
+                const dsRecords = byDataset[dsId];
+                const dsSummary = info.datasets[dsId] || {};
+                const dsMeta = (datasetsMeta || []).find(d => d.id === dsId) || {};
+
+                // Init filter/sort state
+                dsState[dsId] = dsState[dsId] || { gb: 'all', sortCol: 'Eseg', sortAsc: true };
+
+                const isFirst = i === 0;
+                html += `<div class="dataset-section" data-ds="${dsId}">`;
+                html += `<div class="dataset-header" onclick="toggleDataset('${dsId}')">
+                    <div>
+                        <h4>${dsMeta.name || dsId}</h4>
+                        <span class="meta">${dsMeta.method || ''} &mdash; ${dsRecords.length} records</span>
+                    </div>
+                    <span class="toggle-arrow ${isFirst ? 'open' : ''}" id="arrow-${dsId}">&#9654;</span>
+                </div>`;
+                html += `<div class="dataset-body ${isFirst ? '' : 'collapsed'}" id="body-${dsId}">`;
+
+                // Summary stats
+                html += `<div class="summary-grid">`;
+                html += `<div class="summary-stat"><div class="value">${dsRecords.length}</div><div class="label">Records</div></div>`;
+                if (dsSummary.Eseg_mean != null) {
+                    html += `<div class="summary-stat"><div class="value">${dsSummary.Eseg_mean} eV</div><div class="label">Mean E<sub>seg</sub></div></div>`;
+                    html += `<div class="summary-stat"><div class="value">${dsSummary.Eseg_min} / ${dsSummary.Eseg_max}</div><div class="label">Min / Max E<sub>seg</sub></div></div>`;
+                }
+                if (dsSummary.n_grain_boundaries) {
+                    html += `<div class="summary-stat"><div class="value">${dsSummary.n_grain_boundaries}</div><div class="label">Grain Boundaries</div></div>`;
+                }
+                if (dsSummary.n_sites) {
+                    html += `<div class="summary-stat"><div class="value">${dsSummary.n_sites}</div><div class="label">Sites</div></div>`;
+                }
+                html += `<div class="summary-stat"><div class="value">${(dsSummary.converged_frac * 100).toFixed(1)}%</div><div class="label">Converged</div></div>`;
+                html += `</div>`;
+
+                // GB filter (if applicable)
+                if (dsSummary.grain_boundaries && dsSummary.grain_boundaries.length > 1) {
+                    html += `<div class="filter-bar" id="gb-filter-${dsId}">
+                        <span class="filter-bar-label">GB:</span>
+                        <button class="active" data-gb="all" onclick="setGBFilter('${dsId}','all',this)">All</button>`;
+                    dsSummary.grain_boundaries.forEach(gb => {
+                        html += `<button data-gb="${gb}" onclick="setGBFilter('${dsId}','${gb}',this)">${gb}</button>`;
+                    });
+                    html += `</div>`;
+                }
+
+                // Table
+                html += `<div class="detail-table-wrap" id="table-${dsId}"></div>`;
+
+                // Download
+                html += `<div style="margin-top:0.5rem;">
+                    <button class="tag" style="cursor:pointer;border:1px solid var(--primary-color);background:none;color:var(--primary-color);"
+                        onclick="downloadDatasetCSV('${dsId}')">Download CSV</button>
+                </div>`;
+
+                html += `</div></div>`; // close body + section
+            });
+
+            content.innerHTML = html;
+
+            // Render tables for each dataset
+            dsIds.forEach(dsId => renderDatasetTable(dsId, byDataset[dsId]));
+        }
+
+        // ── Dataset section toggle ────────────────────────────────
+        function toggleDataset(dsId) {
+            const body = document.getElementById(`body-${dsId}`);
+            const arrow = document.getElementById(`arrow-${dsId}`);
+            body.classList.toggle('collapsed');
+            arrow.classList.toggle('open');
+        }
+
+        // ── GB filter ─────────────────────────────────────────────
+        function setGBFilter(dsId, gb, btn) {
+            dsState[dsId].gb = gb;
+            const bar = document.getElementById(`gb-filter-${dsId}`);
+            if (bar) bar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderDatasetTable(dsId);
+        }
+
+        // ── Table rendering ───────────────────────────────────────
+        function getFilteredSorted(dsId, records) {
+            if (!records) {
+                records = (currentRecords || []).filter(r => r.dataset_id === dsId);
+            }
+            const st = dsState[dsId] || { gb: 'all', sortCol: 'Eseg', sortAsc: true };
+            let filtered = records;
+            if (st.gb !== 'all') {
+                filtered = filtered.filter(r => r.GB === st.gb);
+            }
+            filtered = [...filtered].sort((a, b) => {
+                let va = a[st.sortCol], vb = b[st.sortCol];
+                if (va == null) return 1;
+                if (vb == null) return -1;
+                if (typeof va === 'string') return st.sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+                return st.sortAsc ? va - vb : vb - va;
+            });
+            return filtered;
+        }
+
+        function renderDatasetTable(dsId, records) {
+            const wrap = document.getElementById(`table-${dsId}`);
+            if (!wrap) return;
+            const filtered = getFilteredSorted(dsId, records);
+            const st = dsState[dsId];
+
+            // Determine columns from data
+            const cols = [];
+            const sample = filtered[0] || {};
+            if ('GB' in sample) cols.push({ key: 'GB', label: 'Grain Boundary' });
+            if ('site' in sample) cols.push({ key: 'site', label: 'Site' });
+            if ('state' in sample) cols.push({ key: 'state', label: 'State' });
+            if ('Eseg' in sample) cols.push({ key: 'Eseg', label: 'E_seg (eV)' });
+            if ('energy' in sample) cols.push({ key: 'energy', label: 'Energy (eV)' });
+            if ('convergence' in sample) cols.push({ key: 'convergence', label: 'Converged' });
+            if ('n_Fe' in sample) cols.push({ key: 'n_Fe', label: 'n_Fe' });
+            if ('scf_steps' in sample) cols.push({ key: 'scf_steps', label: 'SCF Steps' });
+
+            let html = '<table class="detail-table"><thead><tr>';
+            cols.forEach(c => {
+                const arrow = st.sortCol === c.key ? (st.sortAsc ? ' &#9650;' : ' &#9660;') : '';
+                html += `<th onclick="sortDataset('${dsId}','${c.key}')">${c.label}${arrow}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            if (filtered.length === 0) {
+                html += `<tr><td colspan="${cols.length}" style="text-align:center;color:#999;padding:1.5rem;">No records match filters.</td></tr>`;
+            } else {
+                filtered.forEach(r => {
+                    html += '<tr>';
+                    cols.forEach(c => {
+                        let val = r[c.key];
+                        if (c.key === 'Eseg' || c.key === 'energy') val = val != null ? val.toFixed(4) : '-';
+                        else if (c.key === 'convergence') val = val ? 'Yes' : 'No';
+                        else if (val == null) val = '-';
+                        html += `<td>${val}</td>`;
+                    });
+                    html += '</tr>';
+                });
+            }
+            html += '</tbody></table>';
+            wrap.innerHTML = html;
+        }
+
+        function sortDataset(dsId, col) {
+            const st = dsState[dsId];
+            if (st.sortCol === col) { st.sortAsc = !st.sortAsc; }
+            else { st.sortCol = col; st.sortAsc = true; }
+            renderDatasetTable(dsId);
+        }
+
+        // ── CSV download ──────────────────────────────────────────
+        function downloadDatasetCSV(dsId) {
+            const filtered = getFilteredSorted(dsId);
+            if (!filtered.length) return;
+            const cols = Object.keys(filtered[0]).filter(k => !k.startsWith('dataset_'));
+            let csv = cols.join(',') + '\n';
+            filtered.forEach(r => {
+                csv += cols.map(c => {
+                    let v = r[c];
+                    if (v == null) return '';
+                    if (typeof v === 'string' && v.includes(',')) return `"${v}"`;
+                    return v;
+                }).join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentSymbol}_${dsId}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>

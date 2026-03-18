@@ -1,0 +1,2 @@
+# Parquet files are too large for GitHub Pages — host on R2 instead
+*.parquet

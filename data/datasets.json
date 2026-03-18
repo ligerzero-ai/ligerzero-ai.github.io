@@ -1,0 +1,20 @@
+[
+  {
+    "id": "fe_x_gb_kp_unrelaxed",
+    "name": "Fe-X GB Segregation (KP, Unrelaxed)",
+    "category": "Fe-X GB Segregation",
+    "method": "KP (DFT, VASP/PAW-PBE)",
+    "description": "Unrelaxed substitutional solute segregation in Fe grain boundaries",
+    "n_rows": 4897,
+    "n_elements": 91
+  },
+  {
+    "id": "fe_x_gb_kp_relaxed",
+    "name": "Fe-X GB Segregation (KP, Relaxed)",
+    "category": "Fe-X GB Segregation",
+    "method": "KP (DFT, VASP/PAW-PBE)",
+    "description": "Relaxed substitutional solute segregation in Fe grain boundaries",
+    "n_rows": 4234,
+    "n_elements": 90
+  }
+]
