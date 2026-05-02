@@ -323,7 +323,7 @@
         // =====================================================================
         function renderOverview(dsId, host) {
             const ds = STATE.datasetsMeta.find(d => d.id === dsId);
-            const struct = (STATE.structuresIndex || {})[dsId] || [];
+            const struct = ((STATE.structuresIndex || {}).by_dataset || {})[dsId] || [];
             const ttlEseg = struct.flatMap(g => [g.Eseg_min, g.Eseg_max]).filter(v => v != null);
             const minE = ttlEseg.length ? Math.min(...ttlEseg) : null;
             const maxE = ttlEseg.length ? Math.max(...ttlEseg) : null;
@@ -490,7 +490,7 @@
                 byGB[r.GB].push(r);
             });
 
-            const gbList = (STATE.structuresIndex[dsId] || []).map(g => g.GB);
+            const gbList = ((STATE.structuresIndex.by_dataset || {})[dsId] || []).map(g => g.GB);
 
             // Determine global Eseg range for this element across this dataset
             const allEseg = dsRecords.map(r => r.Eseg).filter(v => v != null);
@@ -551,12 +551,13 @@
             const isUnrelaxed = dsId === 'fe_x_gb_kp_unrelaxed';
             const noteRelaxed = dsId === 'fe_x_gb_kp_relaxed';
 
-            const cacheKey = `${dsId}/${gb}`;
+            // Structures are now shared across datasets — one file per GB
+            const cacheKey = gb;
             let payload = STATE.structureCache[cacheKey];
             if (!payload) {
                 region.innerHTML = `<div class="viewer-loading">Loading structure for <code>${gb}</code>…</div>`;
                 try {
-                    const resp = await fetch(`data/structures/${dsId}/${gb}.json`);
+                    const resp = await fetch(`data/structures/${gb}.json`);
                     payload = await resp.json();
                     STATE.structureCache[cacheKey] = payload;
                 } catch (e) {
@@ -574,7 +575,7 @@
                         in <code>${gb}</code>
                     </div>
                     <div class="viewer-actions">
-                        <a class="download-btn small" href="data/structures/${dsId}/${gb}.json" download="${gb}-${dsId}.json">Site data (JSON)</a>
+                        <a class="download-btn small" href="data/structures/${gb}.json" download="${gb}.json">Site data (JSON)</a>
                         <button class="download-btn small" id="dl-poscar-${dsId}">Host slab (POSCAR)</button>
                     </div>
                 </div>
@@ -625,9 +626,12 @@
             const siteByIndex = {};
             payload.sites.forEach(s => { siteByIndex[s.atom_index] = s; });
 
-            // Determine Eseg range for this (GB, element) for normalization
+            // Pick the Eseg overlay for the active dataset
+            const esegFor = (site) => site?.datasets?.[dsId]?.eseg_by_element?.[element];
+
+            // Determine Eseg range for this (GB, element, dataset) for normalization
             const esegs = payload.sites
-                .map(s => s.eseg_by_element[element])
+                .map(s => esegFor(s))
                 .filter(v => v != null);
             const eMin = esegs.length ? Math.min(...esegs) : -1;
             const eMax = esegs.length ? Math.max(...esegs) : 1;
@@ -636,7 +640,7 @@
             const atoms = payload.host_atoms.map((a, i) => {
                 const site = siteByIndex[i];
                 const isSite = !!site;
-                const eseg = isSite ? site.eseg_by_element[element] : null;
+                const eseg = isSite ? esegFor(site) : null;
                 const sym = isSite ? element : a.element;
                 const radius = elementRadius(sym) * (isSite ? 0.55 : 0.40);
                 const color = isSite
@@ -819,18 +823,19 @@
 
         function renderSiteList(dsId, payload, element, elementName, viewer) {
             const host = document.getElementById(`site-list-${dsId}`);
+            const esegFor = (s) => s?.datasets?.[dsId]?.eseg_by_element?.[element];
             // Sort sites by Eseg ascending (most-segregating first)
             const sorted = [...payload.sites].sort((a, b) => {
-                const ea = a.eseg_by_element[element], eb = b.eseg_by_element[element];
+                const ea = esegFor(a), eb = esegFor(b);
                 if (ea == null && eb == null) return 0;
                 if (ea == null) return 1;
                 if (eb == null) return -1;
                 return ea - eb;
             });
-            const absMax = Math.max(...payload.sites.map(s => Math.abs(s.eseg_by_element[element] ?? 0))) || 1;
+            const absMax = Math.max(...payload.sites.map(s => Math.abs(esegFor(s) ?? 0))) || 1;
 
             host.innerHTML = sorted.map(s => {
-                const e = s.eseg_by_element[element];
+                const e = esegFor(s);
                 const eStr = e == null ? '—' : `${e.toFixed(3)} eV`;
                 const swatch = e == null ? '#ddd' : cssColor(esegToColor(e, absMax));
                 return `<div class="site-row" data-label="${s.label}">

@@ -1,102 +1,221 @@
 {
-  "fe_x_gb_kp_unrelaxed": [
+  "geometry_source": "fe_x_gb_kp_unrelaxed",
+  "grain_boundaries": [
     {
       "GB": "S11-RA110-S3-32",
       "n_atoms": 42,
       "n_sites": 12,
-      "n_elements": 91,
-      "Eseg_min": -1.6482,
-      "Eseg_max": 3.6488
+      "datasets": {
+        "fe_x_gb_kp_unrelaxed": {
+          "n_sites": 12,
+          "n_elements": 91,
+          "Eseg_min": -1.6482,
+          "Eseg_max": 3.6488
+        },
+        "fe_x_gb_kp_relaxed": {
+          "n_sites": 12,
+          "n_elements": 90,
+          "Eseg_min": -4.9714,
+          "Eseg_max": 1.7195
+        }
+      }
     },
     {
       "GB": "S3-RA110-S1-11",
       "n_atoms": 72,
       "n_sites": 9,
-      "n_elements": 91,
-      "Eseg_min": -0.983,
-      "Eseg_max": 5.0302
+      "datasets": {
+        "fe_x_gb_kp_unrelaxed": {
+          "n_sites": 9,
+          "n_elements": 91,
+          "Eseg_min": -0.983,
+          "Eseg_max": 5.0302
+        },
+        "fe_x_gb_kp_relaxed": {
+          "n_sites": 9,
+          "n_elements": 90,
+          "Eseg_min": -4.2476,
+          "Eseg_max": 9.692
+        }
+      }
     },
     {
       "GB": "S3-RA110-S1-12",
       "n_atoms": 48,
       "n_sites": 7,
-      "n_elements": 91,
-      "Eseg_min": -0.0802,
-      "Eseg_max": 6.8044
+      "datasets": {
+        "fe_x_gb_kp_unrelaxed": {
+          "n_sites": 7,
+          "n_elements": 91,
+          "Eseg_min": -0.0802,
+          "Eseg_max": 6.8044
+        },
+        "fe_x_gb_kp_relaxed": {
+          "n_sites": 7,
+          "n_elements": 90,
+          "Eseg_min": -3.0672,
+          "Eseg_max": 7.1554
+        }
+      }
     },
     {
       "GB": "S5-RA001-S210",
       "n_atoms": 76,
       "n_sites": 7,
-      "n_elements": 91,
-      "Eseg_min": -2.0935,
-      "Eseg_max": 4.0734
+      "datasets": {
+        "fe_x_gb_kp_unrelaxed": {
+          "n_sites": 7,
+          "n_elements": 91,
+          "Eseg_min": -2.0935,
+          "Eseg_max": 4.0734
+        },
+        "fe_x_gb_kp_relaxed": {
+          "n_sites": 7,
+          "n_elements": 90,
+          "Eseg_min": -3.0859,
+          "Eseg_max": 9.0636
+        }
+      }
     },
     {
       "GB": "S5-RA001-S310",
       "n_atoms": 80,
       "n_sites": 5,
-      "n_elements": 91,
-      "Eseg_min": -1.0041,
-      "Eseg_max": 2.3117
+      "datasets": {
+        "fe_x_gb_kp_unrelaxed": {
+          "n_sites": 5,
+          "n_elements": 91,
+          "Eseg_min": -1.0041,
+          "Eseg_max": 2.3117
+        },
+        "fe_x_gb_kp_relaxed": {
+          "n_sites": 5,
+          "n_elements": 90,
+          "Eseg_min": -2.6095,
+          "Eseg_max": 8.7302
+        }
+      }
     },
     {
       "GB": "S9-RA110-S2-21",
       "n_atoms": 68,
       "n_sites": 14,
-      "n_elements": 91,
-      "Eseg_min": -2.2629,
-      "Eseg_max": 7.1602
+      "datasets": {
+        "fe_x_gb_kp_unrelaxed": {
+          "n_sites": 14,
+          "n_elements": 91,
+          "Eseg_min": -2.2629,
+          "Eseg_max": 7.1602
+        },
+        "fe_x_gb_kp_relaxed": {
+          "n_sites": 14,
+          "n_elements": 90,
+          "Eseg_min": -4.4704,
+          "Eseg_max": 0.5843
+        }
+      }
     }
   ],
-  "fe_x_gb_kp_relaxed": [
-    {
-      "GB": "S11-RA110-S3-32",
-      "n_atoms": 42,
-      "n_sites": 12,
-      "n_elements": 90,
-      "Eseg_min": -4.9714,
-      "Eseg_max": 1.7195
-    },
-    {
-      "GB": "S3-RA110-S1-11",
-      "n_atoms": 72,
-      "n_sites": 9,
-      "n_elements": 90,
-      "Eseg_min": -4.2476,
-      "Eseg_max": 9.692
-    },
-    {
-      "GB": "S3-RA110-S1-12",
-      "n_atoms": 48,
-      "n_sites": 7,
-      "n_elements": 90,
-      "Eseg_min": -3.0672,
-      "Eseg_max": 7.1554
-    },
-    {
-      "GB": "S5-RA001-S210",
-      "n_atoms": 76,
-      "n_sites": 7,
-      "n_elements": 90,
-      "Eseg_min": -3.0859,
-      "Eseg_max": 9.0636
-    },
-    {
-      "GB": "S5-RA001-S310",
-      "n_atoms": 80,
-      "n_sites": 5,
-      "n_elements": 90,
-      "Eseg_min": -2.6095,
-      "Eseg_max": 8.7302
-    },
-    {
-      "GB": "S9-RA110-S2-21",
-      "n_atoms": 68,
-      "n_sites": 14,
-      "n_elements": 90,
-      "Eseg_min": -4.4704,
-      "Eseg_max": 0.5843
-    }
-  ]
+  "by_dataset": {
+    "fe_x_gb_kp_unrelaxed": [
+      {
+        "GB": "S11-RA110-S3-32",
+        "n_atoms": 42,
+        "n_sites": 12,
+        "n_elements": 91,
+        "Eseg_min": -1.6482,
+        "Eseg_max": 3.6488
+      },
+      {
+        "GB": "S3-RA110-S1-11",
+        "n_atoms": 72,
+        "n_sites": 9,
+        "n_elements": 91,
+        "Eseg_min": -0.983,
+        "Eseg_max": 5.0302
+      },
+      {
+        "GB": "S3-RA110-S1-12",
+        "n_atoms": 48,
+        "n_sites": 7,
+        "n_elements": 91,
+        "Eseg_min": -0.0802,
+        "Eseg_max": 6.8044
+      },
+      {
+        "GB": "S5-RA001-S210",
+        "n_atoms": 76,
+        "n_sites": 7,
+        "n_elements": 91,
+        "Eseg_min": -2.0935,
+        "Eseg_max": 4.0734
+      },
+      {
+        "GB": "S5-RA001-S310",
+        "n_atoms": 80,
+        "n_sites": 5,
+        "n_elements": 91,
+        "Eseg_min": -1.0041,
+        "Eseg_max": 2.3117
+      },
+      {
+        "GB": "S9-RA110-S2-21",
+        "n_atoms": 68,
+        "n_sites": 14,
+        "n_elements": 91,
+        "Eseg_min": -2.2629,
+        "Eseg_max": 7.1602
+      }
+    ],
+    "fe_x_gb_kp_relaxed": [
+      {
+        "GB": "S11-RA110-S3-32",
+        "n_atoms": 42,
+        "n_sites": 12,
+        "n_elements": 90,
+        "Eseg_min": -4.9714,
+        "Eseg_max": 1.7195
+      },
+      {
+        "GB": "S3-RA110-S1-11",
+        "n_atoms": 72,
+        "n_sites": 9,
+        "n_elements": 90,
+        "Eseg_min": -4.2476,
+        "Eseg_max": 9.692
+      },
+      {
+        "GB": "S3-RA110-S1-12",
+        "n_atoms": 48,
+        "n_sites": 7,
+        "n_elements": 90,
+        "Eseg_min": -3.0672,
+        "Eseg_max": 7.1554
+      },
+      {
+        "GB": "S5-RA001-S210",
+        "n_atoms": 76,
+        "n_sites": 7,
+        "n_elements": 90,
+        "Eseg_min": -3.0859,
+        "Eseg_max": 9.0636
+      },
+      {
+        "GB": "S5-RA001-S310",
+        "n_atoms": 80,
+        "n_sites": 5,
+        "n_elements": 90,
+        "Eseg_min": -2.6095,
+        "Eseg_max": 8.7302
+      },
+      {
+        "GB": "S9-RA110-S2-21",
+        "n_atoms": 68,
+        "n_sites": 14,
+        "n_elements": 90,
+        "Eseg_min": -4.4704,
+        "Eseg_max": 0.5843
+      }
+    ]
+  }
 }
