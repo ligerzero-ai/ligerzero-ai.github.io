@@ -5,698 +5,910 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Explorer | Han Lin Mai</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .periodic-table {
-            display: grid;
-            grid-template-columns: repeat(18, 1fr);
-            gap: 5px;
-            margin-bottom: 2rem;
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .element-cell {
-            position: relative;
-            aspect-ratio: 1;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: white;
-            padding: 2px;
-            border-radius: 4px;
-        }
-        .element-cell:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: scale(1.1);
-            z-index: 10;
-            border-color: var(--primary-color);
-        }
-        .element-cell.active {
-            background: var(--primary-color);
-            color: white;
-            font-weight: bold;
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
-        }
-        .element-cell strong {
-            font-size: 0.9rem;
-            display: block;
-        }
-        .element-cell .number {
-            font-size: 0.55rem;
-            opacity: 0.7;
-        }
-        .element-cell.has-data {
-            border: 2px solid var(--primary-color);
-        }
-        .element-cell.has-data::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--primary-color);
-        }
-        .element-cell.no-data {
-            opacity: 0.4;
-        }
-        .element-cell .ds-count {
-            position: absolute;
-            bottom: 1px;
-            right: 3px;
-            font-size: 0.45rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        /* Element categories */
-        .reactive-nonmetal { background-color: #e3f2fd; }
-        .noble-gas { background-color: #f3e5f5; }
-        .alkali-metal { background-color: #ffebee; }
-        .alkaline-earth-metal { background-color: #fff3e0; }
-        .metalloid { background-color: #e8f5e9; }
-        .post-transition-metal { background-color: #f1f8e9; }
-        .transition-metal { background-color: #fafafa; }
-        .lanthanide { background-color: #fffde7; }
-        .actinide { background-color: #fbe9e7; }
-
-        .spacer { grid-column: span 1; }
-
-        .data-panel {
-            background: white;
-            border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            min-height: 250px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        #data-status {
-            margin-top: 1rem;
-            font-style: italic;
-            color: #666;
-        }
-        .category-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 2rem;
-            font-size: 0.8rem;
-            justify-content: center;
-        }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
-        .legend-color {
-            width: 15px; height: 15px;
-            border-radius: 3px; border: 1px solid #ddd;
-        }
-
-        /* Dataset section cards */
-        .dataset-section {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-        .dataset-header {
-            background: #f8fafc;
-            padding: 1rem 1.5rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-        }
-        .dataset-header:hover { background: #f1f5f9; }
-        .dataset-header h4 { margin: 0; color: var(--primary-color); }
-        .dataset-header .meta {
-            font-size: 0.8rem; color: #666;
-        }
-        .dataset-header .toggle-arrow {
-            font-size: 1.2rem; transition: transform 0.2s;
-        }
-        .dataset-header .toggle-arrow.open { transform: rotate(90deg); }
-        .dataset-body { padding: 0 1.5rem 1rem; }
-        .dataset-body.collapsed { display: none; }
-
-        /* Summary stats grid */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            margin: 0.75rem 0;
-        }
-        .summary-stat {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 10px;
-            text-align: center;
-        }
-        .summary-stat .value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        .summary-stat .label {
-            font-size: 0.7rem;
-            color: #666;
-            margin-top: 2px;
-        }
-
-        /* Detail table */
-        .detail-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-        }
-        .detail-table th, .detail-table td {
-            text-align: left;
-            padding: 6px 8px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .detail-table th {
-            background: #f3f4f6;
-            position: sticky;
-            top: 0;
-            cursor: pointer;
-            user-select: none;
-        }
-        .detail-table th:hover { background: #e5e7eb; }
-        .detail-table-wrap {
-            max-height: 350px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            margin-top: 0.5rem;
-        }
-
-        /* Filter bars */
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin: 0.5rem 0;
-        }
-        .filter-bar button {
-            padding: 3px 9px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background: white;
-            cursor: pointer;
-            font-size: 0.78rem;
-        }
-        .filter-bar button.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        .filter-bar-label {
-            font-size: 0.78rem;
-            color: #666;
-            align-self: center;
-            margin-right: 4px;
-        }
-
-        /* Overall element summary at top */
-        .element-overview {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .element-overview .big-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            line-height: 1;
-        }
-        .element-overview .big-label {
-            font-size: 0.8rem;
-            color: #666;
-        }
-    </style>
+    <link rel="stylesheet" href="data-explorer.css">
     <script src="sidebar.js"></script>
     <script src="auth-config.js"></script>
     <script src="auth.js"></script>
+    <!-- 3Dmol.js for in-browser atomic structure rendering -->
+    <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
 </head>
 <body>
     <nav></nav>
 
-    <main>
-        <h1>Data Explorer</h1>
-        <p>Select an element to view all available computational data across datasets. Elements with data are highlighted. For dataset details, see the <a href="dataset-info.html">Datasets Overview</a>.</p>
+    <main class="explorer-main">
+        <header class="explorer-header">
+            <h1>Data Explorer</h1>
+            <p class="explorer-subtitle">Interactive views of the computational materials datasets. Pick a dataset tab, drill in by element, then click a grain boundary to see the substitutional sites colored by segregation energy.</p>
+        </header>
 
-        <div class="category-legend">
-            <div class="legend-item"><div class="legend-color alkali-metal"></div> Alkali Metal</div>
-            <div class="legend-item"><div class="legend-color alkaline-earth-metal"></div> Alkaline Earth</div>
-            <div class="legend-item"><div class="legend-color transition-metal"></div> Transition Metal</div>
-            <div class="legend-item"><div class="legend-color lanthanide"></div> Lanthanide</div>
-            <div class="legend-item"><div class="legend-color actinide"></div> Actinide</div>
-            <div class="legend-item"><div class="legend-color post-transition-metal"></div> Post-Transition</div>
-            <div class="legend-item"><div class="legend-color metalloid"></div> Metalloid</div>
-            <div class="legend-item"><div class="legend-color reactive-nonmetal"></div> Nonmetal</div>
-            <div class="legend-item"><div class="legend-color noble-gas"></div> Noble Gas</div>
-        </div>
+        <!-- Top-level dataset tabs -->
+        <div class="dataset-tabs" id="dataset-tabs" role="tablist"></div>
 
-        <div class="periodic-table" id="periodic-table"></div>
+        <!-- Per-dataset panels (one rendered active at a time) -->
+        <div id="dataset-panels"></div>
 
-        <div class="data-panel" id="data-panel">
-            <h3>Selected Element: <span id="selected-symbol">-</span> <span id="selected-name" style="font-weight: normal; font-size: 1.1rem; color: #666;"></span></h3>
-            <div id="data-content">
-                <p>Click on an element above to explore all available computational data.</p>
-                <p><small>Data spans multiple datasets including grain boundary segregation, cohesion, and more. Each dataset section can be expanded to view individual records, filtered and sorted.</small></p>
+        <!-- Templates ----------------------------------------------------- -->
+        <template id="tpl-dataset-panel">
+            <div class="dataset-panel" role="tabpanel">
+                <nav class="subtab-nav" role="tablist">
+                    <button class="subtab-btn active" data-subtab="overview" role="tab">Overview</button>
+                    <button class="subtab-btn" data-subtab="browse" role="tab">Browse by Element</button>
+                </nav>
+
+                <section class="subtab-pane subtab-overview active" data-pane="overview"></section>
+                <section class="subtab-pane subtab-browse" data-pane="browse" hidden>
+                    <div class="browse-layout">
+                        <div class="browse-pt">
+                            <p class="browse-help">Click a highlighted element to see its data in this dataset. Highlighted = data available; dim = none.</p>
+                            <div class="periodic-table"></div>
+                            <div class="category-legend">
+                                <div class="legend-item"><div class="legend-color alkali-metal"></div> Alkali</div>
+                                <div class="legend-item"><div class="legend-color alkaline-earth-metal"></div> Alkaline E.</div>
+                                <div class="legend-item"><div class="legend-color transition-metal"></div> Transition</div>
+                                <div class="legend-item"><div class="legend-color lanthanide"></div> Lanthanide</div>
+                                <div class="legend-item"><div class="legend-color actinide"></div> Actinide</div>
+                                <div class="legend-item"><div class="legend-color post-transition-metal"></div> Post-Tr.</div>
+                                <div class="legend-item"><div class="legend-color metalloid"></div> Metalloid</div>
+                                <div class="legend-item"><div class="legend-color reactive-nonmetal"></div> Nonmetal</div>
+                                <div class="legend-item"><div class="legend-color noble-gas"></div> Noble</div>
+                            </div>
+                        </div>
+                        <aside class="browse-element-panel">
+                            <div class="element-empty">
+                                <p>Pick an element to begin.</p>
+                            </div>
+                        </aside>
+                    </div>
+                    <div class="browse-viewer-region" hidden></div>
+                </section>
             </div>
-            <div id="data-status"></div>
-        </div>
+        </template>
     </main>
 
     <script>
-        let elementIndex = null;
-        let datasetsMeta = null;
-
-        const elements = [
-            {number: 1, symbol: "H", name: "Hydrogen", col: 1, row: 1, cat: "reactive-nonmetal"},
-            {number: 2, symbol: "He", name: "Helium", col: 18, row: 1, cat: "noble-gas"},
-            {number: 3, symbol: "Li", name: "Lithium", col: 1, row: 2, cat: "alkali-metal"},
-            {number: 4, symbol: "Be", name: "Beryllium", col: 2, row: 2, cat: "alkaline-earth-metal"},
-            {number: 5, symbol: "B", name: "Boron", col: 13, row: 2, cat: "metalloid"},
-            {number: 6, symbol: "C", name: "Carbon", col: 14, row: 2, cat: "reactive-nonmetal"},
-            {number: 7, symbol: "N", name: "Nitrogen", col: 15, row: 2, cat: "reactive-nonmetal"},
-            {number: 8, symbol: "O", name: "Oxygen", col: 16, row: 2, cat: "reactive-nonmetal"},
-            {number: 9, symbol: "F", name: "Fluorine", col: 17, row: 2, cat: "reactive-nonmetal"},
-            {number: 10, symbol: "Ne", name: "Neon", col: 18, row: 2, cat: "noble-gas"},
-            {number: 11, symbol: "Na", name: "Sodium", col: 1, row: 3, cat: "alkali-metal"},
-            {number: 12, symbol: "Mg", name: "Magnesium", col: 2, row: 3, cat: "alkaline-earth-metal"},
-            {number: 13, symbol: "Al", name: "Aluminum", col: 13, row: 3, cat: "post-transition-metal"},
-            {number: 14, symbol: "Si", name: "Silicon", col: 14, row: 3, cat: "metalloid"},
-            {number: 15, symbol: "P", name: "Phosphorus", col: 15, row: 3, cat: "reactive-nonmetal"},
-            {number: 16, symbol: "S", name: "Sulfur", col: 16, row: 3, cat: "reactive-nonmetal"},
-            {number: 17, symbol: "Cl", name: "Chlorine", col: 17, row: 3, cat: "reactive-nonmetal"},
-            {number: 18, symbol: "Ar", name: "Argon", col: 18, row: 3, cat: "noble-gas"},
-            {number: 19, symbol: "K", name: "Potassium", col: 1, row: 4, cat: "alkali-metal"},
-            {number: 20, symbol: "Ca", name: "Calcium", col: 2, row: 4, cat: "alkaline-earth-metal"},
-            {number: 21, symbol: "Sc", name: "Scandium", col: 3, row: 4, cat: "transition-metal"},
-            {number: 22, symbol: "Ti", name: "Titanium", col: 4, row: 4, cat: "transition-metal"},
-            {number: 23, symbol: "V", name: "Vanadium", col: 5, row: 4, cat: "transition-metal"},
-            {number: 24, symbol: "Cr", name: "Chromium", col: 6, row: 4, cat: "transition-metal"},
-            {number: 25, symbol: "Mn", name: "Manganese", col: 7, row: 4, cat: "transition-metal"},
-            {number: 26, symbol: "Fe", name: "Iron", col: 8, row: 4, cat: "transition-metal"},
-            {number: 27, symbol: "Co", name: "Cobalt", col: 9, row: 4, cat: "transition-metal"},
-            {number: 28, symbol: "Ni", name: "Nickel", col: 10, row: 4, cat: "transition-metal"},
-            {number: 29, symbol: "Cu", name: "Copper", col: 11, row: 4, cat: "transition-metal"},
-            {number: 30, symbol: "Zn", name: "Zinc", col: 12, row: 4, cat: "transition-metal"},
-            {number: 31, symbol: "Ga", name: "Gallium", col: 13, row: 4, cat: "post-transition-metal"},
-            {number: 32, symbol: "Ge", name: "Germanium", col: 14, row: 4, cat: "metalloid"},
-            {number: 33, symbol: "As", name: "Arsenic", col: 15, row: 4, cat: "metalloid"},
-            {number: 34, symbol: "Se", name: "Selenium", col: 16, row: 4, cat: "reactive-nonmetal"},
-            {number: 35, symbol: "Br", name: "Bromine", col: 17, row: 4, cat: "reactive-nonmetal"},
-            {number: 36, symbol: "Kr", name: "Krypton", col: 18, row: 4, cat: "noble-gas"},
-            {number: 37, symbol: "Rb", name: "Rubidium", col: 1, row: 5, cat: "alkali-metal"},
-            {number: 38, symbol: "Sr", name: "Strontium", col: 2, row: 5, cat: "alkaline-earth-metal"},
-            {number: 39, symbol: "Y", name: "Yttrium", col: 3, row: 5, cat: "transition-metal"},
-            {number: 40, symbol: "Zr", name: "Zirconium", col: 4, row: 5, cat: "transition-metal"},
-            {number: 41, symbol: "Nb", name: "Niobium", col: 5, row: 5, cat: "transition-metal"},
-            {number: 42, symbol: "Mo", name: "Molybdenum", col: 6, row: 5, cat: "transition-metal"},
-            {number: 43, symbol: "Tc", name: "Technetium", col: 7, row: 5, cat: "transition-metal"},
-            {number: 44, symbol: "Ru", name: "Ruthenium", col: 8, row: 5, cat: "transition-metal"},
-            {number: 45, symbol: "Rh", name: "Rhodium", col: 9, row: 5, cat: "transition-metal"},
-            {number: 46, symbol: "Pd", name: "Palladium", col: 10, row: 5, cat: "transition-metal"},
-            {number: 47, symbol: "Ag", name: "Silver", col: 11, row: 5, cat: "transition-metal"},
-            {number: 48, symbol: "Cd", name: "Cadmium", col: 12, row: 5, cat: "transition-metal"},
-            {number: 49, symbol: "In", name: "Indium", col: 13, row: 5, cat: "post-transition-metal"},
-            {number: 50, symbol: "Sn", name: "Tin", col: 14, row: 5, cat: "post-transition-metal"},
-            {number: 51, symbol: "Sb", name: "Antimony", col: 15, row: 5, cat: "metalloid"},
-            {number: 52, symbol: "Te", name: "Tellurium", col: 16, row: 5, cat: "metalloid"},
-            {number: 53, symbol: "I", name: "Iodine", col: 17, row: 5, cat: "reactive-nonmetal"},
-            {number: 54, symbol: "Xe", name: "Xenon", col: 18, row: 5, cat: "noble-gas"},
-            {number: 55, symbol: "Cs", name: "Cesium", col: 1, row: 6, cat: "alkali-metal"},
-            {number: 56, symbol: "Ba", name: "Barium", col: 2, row: 6, cat: "alkaline-earth-metal"},
-            {number: 57, symbol: "La", name: "Lanthanum", col: 4, row: 9, cat: "lanthanide"},
-            {number: 72, symbol: "Hf", name: "Hafnium", col: 4, row: 6, cat: "transition-metal"},
-            {number: 73, symbol: "Ta", name: "Tantalum", col: 5, row: 6, cat: "transition-metal"},
-            {number: 74, symbol: "W", name: "Tungsten", col: 6, row: 6, cat: "transition-metal"},
-            {number: 75, symbol: "Re", name: "Rhenium", col: 7, row: 6, cat: "transition-metal"},
-            {number: 76, symbol: "Os", name: "Osmium", col: 8, row: 6, cat: "transition-metal"},
-            {number: 77, symbol: "Ir", name: "Iridium", col: 9, row: 6, cat: "transition-metal"},
-            {number: 78, symbol: "Pt", name: "Platinum", col: 10, row: 6, cat: "transition-metal"},
-            {number: 79, symbol: "Au", name: "Gold", col: 11, row: 6, cat: "transition-metal"},
-            {number: 80, symbol: "Hg", name: "Mercury", col: 12, row: 6, cat: "transition-metal"},
-            {number: 81, symbol: "Tl", name: "Thallium", col: 13, row: 6, cat: "post-transition-metal"},
-            {number: 82, symbol: "Pb", name: "Lead", col: 14, row: 6, cat: "post-transition-metal"},
-            {number: 83, symbol: "Bi", name: "Bismuth", col: 15, row: 6, cat: "post-transition-metal"},
-            {number: 84, symbol: "Po", name: "Polonium", col: 16, row: 6, cat: "post-transition-metal"},
-            {number: 85, symbol: "At", name: "Astatine", col: 17, row: 6, cat: "metalloid"},
-            {number: 86, symbol: "Rn", name: "Radon", col: 18, row: 6, cat: "noble-gas"},
-            {number: 87, symbol: "Fr", name: "Francium", col: 1, row: 7, cat: "alkali-metal"},
-            {number: 88, symbol: "Ra", name: "Radium", col: 2, row: 7, cat: "alkaline-earth-metal"},
-            {number: 89, symbol: "Ac", name: "Actinium", col: 4, row: 10, cat: "actinide"},
-            {number: 104, symbol: "Rf", name: "Rutherfordium", col: 4, row: 7, cat: "transition-metal"},
-            {number: 105, symbol: "Db", name: "Dubnium", col: 5, row: 7, cat: "transition-metal"},
-            {number: 106, symbol: "Sg", name: "Seaborgium", col: 6, row: 7, cat: "transition-metal"},
-            {number: 107, symbol: "Bh", name: "Bohrium", col: 7, row: 7, cat: "transition-metal"},
-            {number: 108, symbol: "Hs", name: "Hassium", col: 8, row: 7, cat: "transition-metal"},
-            {number: 109, symbol: "Mt", name: "Meitnerium", col: 9, row: 7, cat: "transition-metal"},
-            {number: 110, symbol: "Ds", name: "Darmstadtium", col: 10, row: 7, cat: "transition-metal"},
-            {number: 111, symbol: "Rg", name: "Roentgenium", col: 11, row: 7, cat: "transition-metal"},
-            {number: 112, symbol: "Cn", name: "Copernicium", col: 12, row: 7, cat: "transition-metal"},
-            {number: 113, symbol: "Nh", name: "Nihonium", col: 13, row: 7, cat: "post-transition-metal"},
-            {number: 114, symbol: "Fl", name: "Flerovium", col: 14, row: 7, cat: "post-transition-metal"},
-            {number: 115, symbol: "Mc", name: "Moscovium", col: 15, row: 7, cat: "post-transition-metal"},
-            {number: 116, symbol: "Lv", name: "Livermorium", col: 16, row: 7, cat: "post-transition-metal"},
-            {number: 117, symbol: "Ts", name: "Tennessine", col: 17, row: 7, cat: "post-transition-metal"},
-            {number: 118, symbol: "Og", name: "Oganesson", col: 18, row: 7, cat: "noble-gas"},
-            // Lanthanides
-            {number: 58, symbol: "Ce", name: "Cerium", col: 5, row: 9, cat: "lanthanide"},
-            {number: 59, symbol: "Pr", name: "Praseodymium", col: 6, row: 9, cat: "lanthanide"},
-            {number: 60, symbol: "Nd", name: "Neodymium", col: 7, row: 9, cat: "lanthanide"},
-            {number: 61, symbol: "Pm", name: "Promethium", col: 8, row: 9, cat: "lanthanide"},
-            {number: 62, symbol: "Sm", name: "Samarium", col: 9, row: 9, cat: "lanthanide"},
-            {number: 63, symbol: "Eu", name: "Europium", col: 10, row: 9, cat: "lanthanide"},
-            {number: 64, symbol: "Gd", name: "Gadolinium", col: 11, row: 9, cat: "lanthanide"},
-            {number: 65, symbol: "Tb", name: "Terbium", col: 12, row: 9, cat: "lanthanide"},
-            {number: 66, symbol: "Dy", name: "Dysprosium", col: 13, row: 9, cat: "lanthanide"},
-            {number: 67, symbol: "Ho", name: "Holmium", col: 14, row: 9, cat: "lanthanide"},
-            {number: 68, symbol: "Er", name: "Erbium", col: 15, row: 9, cat: "lanthanide"},
-            {number: 69, symbol: "Tm", name: "Thulium", col: 16, row: 9, cat: "lanthanide"},
-            {number: 70, symbol: "Yb", name: "Ytterbium", col: 17, row: 9, cat: "lanthanide"},
-            {number: 71, symbol: "Lu", name: "Lutetium", col: 18, row: 9, cat: "lanthanide"},
-            // Actinides
-            {number: 90, symbol: "Th", name: "Thorium", col: 5, row: 10, cat: "actinide"},
-            {number: 91, symbol: "Pa", name: "Protactinium", col: 6, row: 10, cat: "actinide"},
-            {number: 92, symbol: "U", name: "Uranium", col: 7, row: 10, cat: "actinide"},
-            {number: 93, symbol: "Np", name: "Neptunium", col: 8, row: 10, cat: "actinide"},
-            {number: 94, symbol: "Pu", name: "Plutonium", col: 9, row: 10, cat: "actinide"},
-            {number: 95, symbol: "Am", name: "Americium", col: 10, row: 10, cat: "actinide"},
-            {number: 96, symbol: "Cm", name: "Curium", col: 11, row: 10, cat: "actinide"},
-            {number: 97, symbol: "Bk", name: "Berkelium", col: 12, row: 10, cat: "actinide"},
-            {number: 98, symbol: "Cf", name: "Californium", col: 13, row: 10, cat: "actinide"},
-            {number: 99, symbol: "Es", name: "Einsteinium", col: 14, row: 10, cat: "actinide"},
-            {number: 100, symbol: "Fm", name: "Fermium", col: 15, row: 10, cat: "actinide"},
-            {number: 101, symbol: "Md", name: "Mendelevium", col: 16, row: 10, cat: "actinide"},
-            {number: 102, symbol: "No", name: "Nobelium", col: 17, row: 10, cat: "actinide"},
-            {number: 103, symbol: "Lr", name: "Lawrencium", col: 18, row: 10, cat: "actinide"},
+        // =====================================================================
+        // Static element data (used to draw the periodic table)
+        // =====================================================================
+        const ELEMENTS = [
+            {number:1,symbol:"H",name:"Hydrogen",col:1,row:1,cat:"reactive-nonmetal"},
+            {number:2,symbol:"He",name:"Helium",col:18,row:1,cat:"noble-gas"},
+            {number:3,symbol:"Li",name:"Lithium",col:1,row:2,cat:"alkali-metal"},
+            {number:4,symbol:"Be",name:"Beryllium",col:2,row:2,cat:"alkaline-earth-metal"},
+            {number:5,symbol:"B",name:"Boron",col:13,row:2,cat:"metalloid"},
+            {number:6,symbol:"C",name:"Carbon",col:14,row:2,cat:"reactive-nonmetal"},
+            {number:7,symbol:"N",name:"Nitrogen",col:15,row:2,cat:"reactive-nonmetal"},
+            {number:8,symbol:"O",name:"Oxygen",col:16,row:2,cat:"reactive-nonmetal"},
+            {number:9,symbol:"F",name:"Fluorine",col:17,row:2,cat:"reactive-nonmetal"},
+            {number:10,symbol:"Ne",name:"Neon",col:18,row:2,cat:"noble-gas"},
+            {number:11,symbol:"Na",name:"Sodium",col:1,row:3,cat:"alkali-metal"},
+            {number:12,symbol:"Mg",name:"Magnesium",col:2,row:3,cat:"alkaline-earth-metal"},
+            {number:13,symbol:"Al",name:"Aluminum",col:13,row:3,cat:"post-transition-metal"},
+            {number:14,symbol:"Si",name:"Silicon",col:14,row:3,cat:"metalloid"},
+            {number:15,symbol:"P",name:"Phosphorus",col:15,row:3,cat:"reactive-nonmetal"},
+            {number:16,symbol:"S",name:"Sulfur",col:16,row:3,cat:"reactive-nonmetal"},
+            {number:17,symbol:"Cl",name:"Chlorine",col:17,row:3,cat:"reactive-nonmetal"},
+            {number:18,symbol:"Ar",name:"Argon",col:18,row:3,cat:"noble-gas"},
+            {number:19,symbol:"K",name:"Potassium",col:1,row:4,cat:"alkali-metal"},
+            {number:20,symbol:"Ca",name:"Calcium",col:2,row:4,cat:"alkaline-earth-metal"},
+            {number:21,symbol:"Sc",name:"Scandium",col:3,row:4,cat:"transition-metal"},
+            {number:22,symbol:"Ti",name:"Titanium",col:4,row:4,cat:"transition-metal"},
+            {number:23,symbol:"V",name:"Vanadium",col:5,row:4,cat:"transition-metal"},
+            {number:24,symbol:"Cr",name:"Chromium",col:6,row:4,cat:"transition-metal"},
+            {number:25,symbol:"Mn",name:"Manganese",col:7,row:4,cat:"transition-metal"},
+            {number:26,symbol:"Fe",name:"Iron",col:8,row:4,cat:"transition-metal"},
+            {number:27,symbol:"Co",name:"Cobalt",col:9,row:4,cat:"transition-metal"},
+            {number:28,symbol:"Ni",name:"Nickel",col:10,row:4,cat:"transition-metal"},
+            {number:29,symbol:"Cu",name:"Copper",col:11,row:4,cat:"transition-metal"},
+            {number:30,symbol:"Zn",name:"Zinc",col:12,row:4,cat:"transition-metal"},
+            {number:31,symbol:"Ga",name:"Gallium",col:13,row:4,cat:"post-transition-metal"},
+            {number:32,symbol:"Ge",name:"Germanium",col:14,row:4,cat:"metalloid"},
+            {number:33,symbol:"As",name:"Arsenic",col:15,row:4,cat:"metalloid"},
+            {number:34,symbol:"Se",name:"Selenium",col:16,row:4,cat:"reactive-nonmetal"},
+            {number:35,symbol:"Br",name:"Bromine",col:17,row:4,cat:"reactive-nonmetal"},
+            {number:36,symbol:"Kr",name:"Krypton",col:18,row:4,cat:"noble-gas"},
+            {number:37,symbol:"Rb",name:"Rubidium",col:1,row:5,cat:"alkali-metal"},
+            {number:38,symbol:"Sr",name:"Strontium",col:2,row:5,cat:"alkaline-earth-metal"},
+            {number:39,symbol:"Y",name:"Yttrium",col:3,row:5,cat:"transition-metal"},
+            {number:40,symbol:"Zr",name:"Zirconium",col:4,row:5,cat:"transition-metal"},
+            {number:41,symbol:"Nb",name:"Niobium",col:5,row:5,cat:"transition-metal"},
+            {number:42,symbol:"Mo",name:"Molybdenum",col:6,row:5,cat:"transition-metal"},
+            {number:43,symbol:"Tc",name:"Technetium",col:7,row:5,cat:"transition-metal"},
+            {number:44,symbol:"Ru",name:"Ruthenium",col:8,row:5,cat:"transition-metal"},
+            {number:45,symbol:"Rh",name:"Rhodium",col:9,row:5,cat:"transition-metal"},
+            {number:46,symbol:"Pd",name:"Palladium",col:10,row:5,cat:"transition-metal"},
+            {number:47,symbol:"Ag",name:"Silver",col:11,row:5,cat:"transition-metal"},
+            {number:48,symbol:"Cd",name:"Cadmium",col:12,row:5,cat:"transition-metal"},
+            {number:49,symbol:"In",name:"Indium",col:13,row:5,cat:"post-transition-metal"},
+            {number:50,symbol:"Sn",name:"Tin",col:14,row:5,cat:"post-transition-metal"},
+            {number:51,symbol:"Sb",name:"Antimony",col:15,row:5,cat:"metalloid"},
+            {number:52,symbol:"Te",name:"Tellurium",col:16,row:5,cat:"metalloid"},
+            {number:53,symbol:"I",name:"Iodine",col:17,row:5,cat:"reactive-nonmetal"},
+            {number:54,symbol:"Xe",name:"Xenon",col:18,row:5,cat:"noble-gas"},
+            {number:55,symbol:"Cs",name:"Cesium",col:1,row:6,cat:"alkali-metal"},
+            {number:56,symbol:"Ba",name:"Barium",col:2,row:6,cat:"alkaline-earth-metal"},
+            {number:57,symbol:"La",name:"Lanthanum",col:4,row:9,cat:"lanthanide"},
+            {number:72,symbol:"Hf",name:"Hafnium",col:4,row:6,cat:"transition-metal"},
+            {number:73,symbol:"Ta",name:"Tantalum",col:5,row:6,cat:"transition-metal"},
+            {number:74,symbol:"W",name:"Tungsten",col:6,row:6,cat:"transition-metal"},
+            {number:75,symbol:"Re",name:"Rhenium",col:7,row:6,cat:"transition-metal"},
+            {number:76,symbol:"Os",name:"Osmium",col:8,row:6,cat:"transition-metal"},
+            {number:77,symbol:"Ir",name:"Iridium",col:9,row:6,cat:"transition-metal"},
+            {number:78,symbol:"Pt",name:"Platinum",col:10,row:6,cat:"transition-metal"},
+            {number:79,symbol:"Au",name:"Gold",col:11,row:6,cat:"transition-metal"},
+            {number:80,symbol:"Hg",name:"Mercury",col:12,row:6,cat:"transition-metal"},
+            {number:81,symbol:"Tl",name:"Thallium",col:13,row:6,cat:"post-transition-metal"},
+            {number:82,symbol:"Pb",name:"Lead",col:14,row:6,cat:"post-transition-metal"},
+            {number:83,symbol:"Bi",name:"Bismuth",col:15,row:6,cat:"post-transition-metal"},
+            {number:84,symbol:"Po",name:"Polonium",col:16,row:6,cat:"post-transition-metal"},
+            {number:85,symbol:"At",name:"Astatine",col:17,row:6,cat:"metalloid"},
+            {number:86,symbol:"Rn",name:"Radon",col:18,row:6,cat:"noble-gas"},
+            {number:87,symbol:"Fr",name:"Francium",col:1,row:7,cat:"alkali-metal"},
+            {number:88,symbol:"Ra",name:"Radium",col:2,row:7,cat:"alkaline-earth-metal"},
+            {number:89,symbol:"Ac",name:"Actinium",col:4,row:10,cat:"actinide"},
+            {number:58,symbol:"Ce",name:"Cerium",col:5,row:9,cat:"lanthanide"},
+            {number:59,symbol:"Pr",name:"Praseodymium",col:6,row:9,cat:"lanthanide"},
+            {number:60,symbol:"Nd",name:"Neodymium",col:7,row:9,cat:"lanthanide"},
+            {number:61,symbol:"Pm",name:"Promethium",col:8,row:9,cat:"lanthanide"},
+            {number:62,symbol:"Sm",name:"Samarium",col:9,row:9,cat:"lanthanide"},
+            {number:63,symbol:"Eu",name:"Europium",col:10,row:9,cat:"lanthanide"},
+            {number:64,symbol:"Gd",name:"Gadolinium",col:11,row:9,cat:"lanthanide"},
+            {number:65,symbol:"Tb",name:"Terbium",col:12,row:9,cat:"lanthanide"},
+            {number:66,symbol:"Dy",name:"Dysprosium",col:13,row:9,cat:"lanthanide"},
+            {number:67,symbol:"Ho",name:"Holmium",col:14,row:9,cat:"lanthanide"},
+            {number:68,symbol:"Er",name:"Erbium",col:15,row:9,cat:"lanthanide"},
+            {number:69,symbol:"Tm",name:"Thulium",col:16,row:9,cat:"lanthanide"},
+            {number:70,symbol:"Yb",name:"Ytterbium",col:17,row:9,cat:"lanthanide"},
+            {number:71,symbol:"Lu",name:"Lutetium",col:18,row:9,cat:"lanthanide"},
+            {number:90,symbol:"Th",name:"Thorium",col:5,row:10,cat:"actinide"},
+            {number:91,symbol:"Pa",name:"Protactinium",col:6,row:10,cat:"actinide"},
+            {number:92,symbol:"U",name:"Uranium",col:7,row:10,cat:"actinide"},
+            {number:93,symbol:"Np",name:"Neptunium",col:8,row:10,cat:"actinide"},
+            {number:94,symbol:"Pu",name:"Plutonium",col:9,row:10,cat:"actinide"},
+            {number:95,symbol:"Am",name:"Americium",col:10,row:10,cat:"actinide"},
+            {number:96,symbol:"Cm",name:"Curium",col:11,row:10,cat:"actinide"},
+            {number:97,symbol:"Bk",name:"Berkelium",col:12,row:10,cat:"actinide"},
+            {number:98,symbol:"Cf",name:"Californium",col:13,row:10,cat:"actinide"},
+            {number:99,symbol:"Es",name:"Einsteinium",col:14,row:10,cat:"actinide"},
+            {number:100,symbol:"Fm",name:"Fermium",col:15,row:10,cat:"actinide"},
+            {number:101,symbol:"Md",name:"Mendelevium",col:16,row:10,cat:"actinide"},
+            {number:102,symbol:"No",name:"Nobelium",col:17,row:10,cat:"actinide"},
+            {number:103,symbol:"Lr",name:"Lawrencium",col:18,row:10,cat:"actinide"},
         ];
+        const ELEMENT_BY_SYM = Object.fromEntries(ELEMENTS.map(e => [e.symbol, e]));
 
-        // ── Init ──────────────────────────────────────────────────
-        const container = document.getElementById('periodic-table');
+        // Reasonable per-element atomic radii (Å, covalent) for sphere sizing.
+        // Falls back to 1.4 if not listed.
+        const ATOMIC_RADIUS = {
+            H:0.31,He:0.28,Li:1.28,Be:0.96,B:0.84,C:0.76,N:0.71,O:0.66,F:0.57,Ne:0.58,
+            Na:1.66,Mg:1.41,Al:1.21,Si:1.11,P:1.07,S:1.05,Cl:1.02,Ar:1.06,
+            K:2.03,Ca:1.76,Sc:1.70,Ti:1.60,V:1.53,Cr:1.39,Mn:1.39,Fe:1.32,Co:1.26,Ni:1.24,Cu:1.32,Zn:1.22,
+            Ga:1.22,Ge:1.20,As:1.19,Se:1.20,Br:1.20,Kr:1.16,
+            Rb:2.20,Sr:1.95,Y:1.90,Zr:1.75,Nb:1.64,Mo:1.54,Tc:1.47,Ru:1.46,Rh:1.42,Pd:1.39,Ag:1.45,Cd:1.44,
+            In:1.42,Sn:1.39,Sb:1.39,Te:1.38,I:1.39,Xe:1.40,
+            Cs:2.44,Ba:2.15,La:2.07,Hf:1.75,Ta:1.70,W:1.62,Re:1.51,Os:1.44,Ir:1.41,Pt:1.36,Au:1.36,Hg:1.32,
+            Tl:1.45,Pb:1.46,Bi:1.48,Po:1.40,At:1.50,Rn:1.50,
+            Ce:2.04,Pr:2.03,Nd:2.01,Pm:1.99,Sm:1.98,Eu:1.98,Gd:1.96,Tb:1.94,Dy:1.92,Ho:1.92,Er:1.89,Tm:1.90,Yb:1.87,Lu:1.87,
+            Th:2.06,Pa:2.00,U:1.96,Np:1.90,Pu:1.87,Am:1.80,
+        };
+        const elementRadius = (sym) => ATOMIC_RADIUS[sym] || 1.4;
 
+        // 3Dmol-flavoured element coloring (Jmol palette). Keep host (Fe) muted so
+        // sub-sites pop visually.
+        const ELEMENT_COLOR = {
+            Fe: 0xa8a29e,  // muted slate for host atoms
+        };
+        const elementColor = (sym) => ELEMENT_COLOR[sym] ?? 0x8b8b8b;
+
+        // =====================================================================
+        // App state
+        // =====================================================================
+        const STATE = {
+            datasetsMeta: null,    // /data/datasets.json
+            elementIndex: null,    // /data/element_index.json
+            structuresIndex: null, // /data/structures/index.json
+            activeDatasetId: null,
+            activeSubtab: { /* ds_id -> 'overview' | 'browse' */ },
+            elementCache: {},      // sym -> records[]
+            structureCache: {},    // `${ds}/${gb}` -> payload
+            viewers: {},           // ds_id -> { gl3dViewer, currentGB, currentElement }
+        };
+
+        // =====================================================================
+        // Init
+        // =====================================================================
         async function init() {
             try {
-                const [indexResp, metaResp] = await Promise.all([
-                    fetch('data/element_index.json'),
-                    fetch('data/datasets.json'),
+                const [meta, idx, struct] = await Promise.all([
+                    fetch('data/datasets.json').then(r => r.json()),
+                    fetch('data/element_index.json').then(r => r.json()),
+                    fetch('data/structures/index.json').then(r => r.json()),
                 ]);
-                elementIndex = await indexResp.json();
-                datasetsMeta = await metaResp.json();
-                buildPeriodicTable();
-                const totalRecords = Object.values(elementIndex).reduce((s, e) => s + e.total_records, 0);
-                document.getElementById('data-status').innerText =
-                    `${Object.keys(elementIndex).length} elements with data across ${datasetsMeta.length} datasets (${totalRecords.toLocaleString()} total records).`;
+                STATE.datasetsMeta = meta;
+                STATE.elementIndex = idx;
+                STATE.structuresIndex = struct;
             } catch (e) {
-                console.error('Failed to load index:', e);
-                buildPeriodicTable();
-                document.getElementById('data-status').innerText = 'Warning: Could not load data index.';
-            }
-        }
-        init();
-
-        function buildPeriodicTable() {
-            container.innerHTML = '';
-            elements.forEach(el => {
-                const div = document.createElement('div');
-                div.className = `element-cell ${el.cat}`;
-                div.style.gridColumn = el.col;
-                div.style.gridRow = el.row;
-                div.dataset.symbol = el.symbol;
-
-                const info = elementIndex && elementIndex[el.symbol];
-                const hasData = !!info;
-
-                let inner = `<span class="number">${el.number}</span><strong>${el.symbol}</strong>`;
-                if (hasData) {
-                    div.classList.add('has-data');
-                    div.title = `${el.name}: ${info.total_records} records across ${info.n_datasets} dataset(s)`;
-                    if (info.n_datasets > 1) {
-                        inner += `<span class="ds-count">${info.n_datasets}</span>`;
-                    }
-                } else {
-                    div.classList.add('no-data');
-                    div.title = `${el.name}: no data available`;
-                }
-
-                div.innerHTML = inner;
-                div.onclick = (e) => loadElement(el.symbol, el.name, e.currentTarget);
-                container.appendChild(div);
-            });
-        }
-
-        // ── Load element ──────────────────────────────────────────
-        let currentRecords = null;
-        let currentSymbol = null;
-
-        // Per-dataset filter/sort state
-        const dsState = {};
-
-        async function loadElement(symbol, name, cellEl) {
-            document.querySelectorAll('.element-cell').forEach(c => c.classList.remove('active'));
-            if (cellEl) cellEl.classList.add('active');
-
-            document.getElementById('selected-symbol').innerText = symbol;
-            document.getElementById('selected-name').innerText = `(${name})`;
-
-            const status = document.getElementById('data-status');
-            const content = document.getElementById('data-content');
-
-            const info = elementIndex && elementIndex[symbol];
-            if (!info) {
-                status.innerText = '';
-                content.innerHTML = `<p>No data available for <strong>${name}</strong> (${symbol}).</p>`;
+                console.error('Failed to load metadata:', e);
+                document.getElementById('dataset-panels').innerHTML =
+                    '<p style="color:#b91c1c">Could not load dataset metadata. Please refresh.</p>';
                 return;
             }
 
-            status.innerText = `Loading data for ${symbol}...`;
-            content.innerHTML = '';
-
-            try {
-                const resp = await fetch(`data/elements/${symbol}.json`);
-                const records = await resp.json();
-                currentRecords = records;
-                currentSymbol = symbol;
-                renderElement(symbol, name, info, records);
-                status.innerText = `Loaded ${records.length} records for ${symbol} across ${info.n_datasets} dataset(s).`;
-            } catch (e) {
-                console.error('Failed to load element:', e);
-                status.innerText = `Error loading data for ${symbol}.`;
-                content.innerHTML = `<p>Failed to fetch data.</p>`;
+            renderTabs();
+            // default: first dataset
+            if (STATE.datasetsMeta.length) {
+                setActiveDataset(STATE.datasetsMeta[0].id);
             }
         }
 
-        // ── Render element panel ──────────────────────────────────
-        function renderElement(symbol, name, info, records) {
-            const content = document.getElementById('data-content');
+        // =====================================================================
+        // Tabs (top-level dataset switcher)
+        // =====================================================================
+        function renderTabs() {
+            const host = document.getElementById('dataset-tabs');
+            host.innerHTML = '';
+            STATE.datasetsMeta.forEach(ds => {
+                const btn = document.createElement('button');
+                btn.className = 'dataset-tab-btn';
+                btn.dataset.ds = ds.id;
+                btn.role = 'tab';
+                btn.innerHTML = `<span class="ds-tab-name">${ds.name}</span>
+                                 <span class="ds-tab-meta">${ds.n_rows.toLocaleString()} records · ${ds.n_elements} elements</span>`;
+                btn.onclick = () => setActiveDataset(ds.id);
+                host.appendChild(btn);
+            });
+        }
 
-            // Overview bar
-            let html = `<div class="element-overview">
-                <div><div class="big-number">${info.total_records}</div><div class="big-label">Total Records</div></div>
-                <div><div class="big-number">${info.n_datasets}</div><div class="big-label">Dataset(s)</div></div>
-            </div>`;
-
-            // Group records by dataset_id
-            const byDataset = {};
-            records.forEach(r => {
-                const dsId = r.dataset_id || 'unknown';
-                if (!byDataset[dsId]) byDataset[dsId] = [];
-                byDataset[dsId].push(r);
+        function setActiveDataset(dsId) {
+            STATE.activeDatasetId = dsId;
+            // tab buttons
+            document.querySelectorAll('.dataset-tab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.ds === dsId);
+                b.setAttribute('aria-selected', b.dataset.ds === dsId);
             });
 
-            // Render a collapsible section per dataset
-            const dsIds = Object.keys(byDataset);
-            dsIds.forEach((dsId, i) => {
-                const dsRecords = byDataset[dsId];
-                const dsSummary = info.datasets[dsId] || {};
-                const dsMeta = (datasetsMeta || []).find(d => d.id === dsId) || {};
+            // ensure panel exists
+            let panel = document.querySelector(`.dataset-panel[data-ds="${dsId}"]`);
+            if (!panel) {
+                panel = mountDatasetPanel(dsId);
+            }
+            document.querySelectorAll('.dataset-panel').forEach(p => {
+                p.classList.toggle('active', p === panel);
+            });
+        }
 
-                // Init filter/sort state
-                dsState[dsId] = dsState[dsId] || { gb: 'all', sortCol: 'Eseg', sortAsc: true };
+        function mountDatasetPanel(dsId) {
+            const tpl = document.getElementById('tpl-dataset-panel');
+            const node = tpl.content.firstElementChild.cloneNode(true);
+            node.dataset.ds = dsId;
+            node.id = `panel-${dsId}`;
+            document.getElementById('dataset-panels').appendChild(node);
 
-                const isFirst = i === 0;
-                html += `<div class="dataset-section" data-ds="${dsId}">`;
-                html += `<div class="dataset-header" onclick="toggleDataset('${dsId}')">
-                    <div>
-                        <h4>${dsMeta.name || dsId}</h4>
-                        <span class="meta">${dsMeta.method || ''} &mdash; ${dsRecords.length} records</span>
+            // sub-tab nav
+            node.querySelectorAll('.subtab-btn').forEach(btn => {
+                btn.onclick = () => setSubtab(dsId, btn.dataset.subtab);
+            });
+
+            // populate Overview pane
+            renderOverview(dsId, node.querySelector('[data-pane="overview"]'));
+            // populate Browse pane (periodic table)
+            buildPeriodicTable(dsId, node.querySelector('.browse-pt .periodic-table'));
+
+            return node;
+        }
+
+        function setSubtab(dsId, sub) {
+            STATE.activeSubtab[dsId] = sub;
+            const panel = document.querySelector(`.dataset-panel[data-ds="${dsId}"]`);
+            if (!panel) return;
+            panel.querySelectorAll('.subtab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.subtab === sub);
+            });
+            panel.querySelectorAll('.subtab-pane').forEach(p => {
+                const active = p.dataset.pane === sub;
+                p.classList.toggle('active', active);
+                p.hidden = !active;
+            });
+            // 3Dmol viewers can render incorrectly when their container was hidden;
+            // resize on display.
+            if (sub === 'browse') {
+                const v = STATE.viewers[dsId];
+                if (v && v.gl3dViewer) {
+                    setTimeout(() => v.gl3dViewer.resize(), 50);
+                }
+            }
+        }
+
+        // =====================================================================
+        // Overview pane
+        // =====================================================================
+        function renderOverview(dsId, host) {
+            const ds = STATE.datasetsMeta.find(d => d.id === dsId);
+            const struct = (STATE.structuresIndex || {})[dsId] || [];
+            const ttlEseg = struct.flatMap(g => [g.Eseg_min, g.Eseg_max]).filter(v => v != null);
+            const minE = ttlEseg.length ? Math.min(...ttlEseg) : null;
+            const maxE = ttlEseg.length ? Math.max(...ttlEseg) : null;
+
+            const params = DATASET_PARAMS[dsId] || DATASET_PARAMS._default;
+
+            host.innerHTML = `
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <h2>${ds.name}</h2>
+                        <p class="overview-desc">${ds.description}</p>
+                        <p class="overview-method"><strong>Method:</strong> ${ds.method}</p>
                     </div>
-                    <span class="toggle-arrow ${isFirst ? 'open' : ''}" id="arrow-${dsId}">&#9654;</span>
-                </div>`;
-                html += `<div class="dataset-body ${isFirst ? '' : 'collapsed'}" id="body-${dsId}">`;
 
-                // Summary stats
-                html += `<div class="summary-grid">`;
-                html += `<div class="summary-stat"><div class="value">${dsRecords.length}</div><div class="label">Records</div></div>`;
-                if (dsSummary.Eseg_mean != null) {
-                    html += `<div class="summary-stat"><div class="value">${dsSummary.Eseg_mean} eV</div><div class="label">Mean E<sub>seg</sub></div></div>`;
-                    html += `<div class="summary-stat"><div class="value">${dsSummary.Eseg_min} / ${dsSummary.Eseg_max}</div><div class="label">Min / Max E<sub>seg</sub></div></div>`;
-                }
-                if (dsSummary.n_grain_boundaries) {
-                    html += `<div class="summary-stat"><div class="value">${dsSummary.n_grain_boundaries}</div><div class="label">Grain Boundaries</div></div>`;
-                }
-                if (dsSummary.n_sites) {
-                    html += `<div class="summary-stat"><div class="value">${dsSummary.n_sites}</div><div class="label">Sites</div></div>`;
-                }
-                html += `<div class="summary-stat"><div class="value">${(dsSummary.converged_frac * 100).toFixed(1)}%</div><div class="label">Converged</div></div>`;
-                html += `</div>`;
+                    <div class="overview-card">
+                        <h3>At a glance</h3>
+                        <div class="stat-grid">
+                            <div class="stat"><div class="stat-num">${ds.n_rows.toLocaleString()}</div><div class="stat-lbl">Records</div></div>
+                            <div class="stat"><div class="stat-num">${ds.n_elements}</div><div class="stat-lbl">Solute elements</div></div>
+                            <div class="stat"><div class="stat-num">${struct.length}</div><div class="stat-lbl">Grain boundaries</div></div>
+                            <div class="stat"><div class="stat-num">${struct.reduce((s,g)=>s+g.n_sites,0)}</div><div class="stat-lbl">Sub. sites (total)</div></div>
+                            ${minE != null ? `<div class="stat"><div class="stat-num">${minE.toFixed(2)} <span class="unit">eV</span></div><div class="stat-lbl">Min E<sub>seg</sub></div></div>` : ''}
+                            ${maxE != null ? `<div class="stat"><div class="stat-num">${maxE.toFixed(2)} <span class="unit">eV</span></div><div class="stat-lbl">Max E<sub>seg</sub></div></div>` : ''}
+                        </div>
+                    </div>
 
-                // GB filter (if applicable)
-                if (dsSummary.grain_boundaries && dsSummary.grain_boundaries.length > 1) {
-                    html += `<div class="filter-bar" id="gb-filter-${dsId}">
-                        <span class="filter-bar-label">GB:</span>
-                        <button class="active" data-gb="all" onclick="setGBFilter('${dsId}','all',this)">All</button>`;
-                    dsSummary.grain_boundaries.forEach(gb => {
-                        html += `<button data-gb="${gb}" onclick="setGBFilter('${dsId}','${gb}',this)">${gb}</button>`;
-                    });
-                    html += `</div>`;
+                    <div class="overview-card">
+                        <h3>Calculation parameters</h3>
+                        <table class="param-table">
+                            <tbody>
+                                ${params.map(p => `<tr><td>${p[0]}</td><td>${p[1]}</td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="overview-card">
+                        <h3>Grain boundaries in this dataset</h3>
+                        <ul class="gb-list">
+                            ${struct.map(g => `<li><code>${g.GB}</code> &mdash; ${g.n_atoms} atoms, ${g.n_sites} sub. sites</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="overview-card span-2">
+                        <h3>Downloads</h3>
+                        <p class="download-blurb">Full dataset including atomic structures, forces, magnetic moments, and INCAR/KPOINTS metadata is available as a single Parquet file.</p>
+                        <div class="download-row">
+                            <a href="${ds.parquet_url}" class="download-btn primary" download>Download full Parquet (${ds.parquet_size_mb || '?'} MB)</a>
+                            <a href="https://pypi.org/project/lzdata/" class="download-btn" target="_blank" rel="noopener">Or use the <code>lzdata</code> Python client &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-row">
+                    <button class="cta-btn" onclick="setSubtab('${dsId}', 'browse')">Browse by element &rarr;</button>
+                </div>
+            `;
+        }
+
+        // Hardcoded calculation parameters (consistent within a dataset).
+        const DATASET_PARAMS = {
+            fe_x_gb_kp_unrelaxed: [
+                ['Code', 'VASP / PAW-PBE'],
+                ['ENCUT', '400 eV'],
+                ['ISMEAR / SIGMA', '1 / 0.1 (Methfessel–Paxton)'],
+                ['EDIFF', '1×10⁻⁵ eV'],
+                ['IBRION / ISIF', '−1 / 2 (no ionic relaxation)'],
+                ['ISPIN', '2 (spin-polarized)'],
+                ['Initial magmoms', 'AFM Fe (KP method)'],
+                ['k-mesh', 'Γ-centered, dataset-dependent'],
+                ['Defect type', 'Substitutional'],
+            ],
+            fe_x_gb_kp_relaxed: [
+                ['Code', 'VASP / PAW-PBE'],
+                ['ENCUT', '400 eV'],
+                ['ISMEAR / SIGMA', '1 / 0.1 (Methfessel–Paxton)'],
+                ['EDIFF / EDIFFG', '1×10⁻⁵ eV / −0.01 eV/Å'],
+                ['IBRION / ISIF', '2 / 2 (ionic relaxation, fixed cell)'],
+                ['ISPIN', '2 (spin-polarized)'],
+                ['Initial magmoms', 'AFM Fe (KP method)'],
+                ['k-mesh', 'Γ-centered, dataset-dependent'],
+                ['Defect type', 'Substitutional'],
+            ],
+            _default: [['Code', 'VASP / PAW-PBE']],
+        };
+
+        // =====================================================================
+        // Periodic table (per-dataset)
+        // =====================================================================
+        function buildPeriodicTable(dsId, container) {
+            container.innerHTML = '';
+            ELEMENTS.forEach(el => {
+                const cell = document.createElement('div');
+                cell.className = `element-cell ${el.cat}`;
+                cell.style.gridColumn = el.col;
+                cell.style.gridRow = el.row;
+                cell.dataset.symbol = el.symbol;
+
+                const info = STATE.elementIndex && STATE.elementIndex[el.symbol];
+                const dsInfo = info && info.datasets && info.datasets[dsId];
+                const hasData = !!dsInfo;
+
+                let inner = `<span class="number">${el.number}</span><strong>${el.symbol}</strong>`;
+                if (hasData) {
+                    cell.classList.add('has-data');
+                    cell.title = `${el.name} — ${dsInfo.count} records in this dataset`;
+                } else {
+                    cell.classList.add('no-data');
+                    cell.title = `${el.name}: not in this dataset`;
                 }
-
-                // Table
-                html += `<div class="detail-table-wrap" id="table-${dsId}"></div>`;
-
-                // Download buttons
-                html += `<div style="margin-top:0.5rem;display:flex;gap:8px;flex-wrap:wrap;">
-                    <button class="tag" style="cursor:pointer;border:1px solid var(--primary-color);background:none;color:var(--primary-color);"
-                        onclick="downloadDatasetCSV('${dsId}')">Download Filtered CSV</button>`;
-                if (dsMeta.parquet_url) {
-                    html += `<a href="${dsMeta.parquet_url}" class="tag" style="text-decoration:none;border:1px solid var(--primary-color);background:var(--primary-color);color:white;padding:3px 9px;border-radius:4px;font-size:0.78rem;"
-                        download>Download Full Parquet (${dsMeta.parquet_size_mb || '?'} MB)</a>`;
-                }
-                html += `</div>`;
-
-                html += `</div></div>`; // close body + section
+                cell.innerHTML = inner;
+                cell.onclick = () => loadElementForDataset(dsId, el.symbol, el.name);
+                container.appendChild(cell);
             });
-
-            content.innerHTML = html;
-
-            // Render tables for each dataset
-            dsIds.forEach(dsId => renderDatasetTable(dsId, byDataset[dsId]));
         }
 
-        // ── Dataset section toggle ────────────────────────────────
-        function toggleDataset(dsId) {
-            const body = document.getElementById(`body-${dsId}`);
-            const arrow = document.getElementById(`arrow-${dsId}`);
-            body.classList.toggle('collapsed');
-            arrow.classList.toggle('open');
-        }
+        // =====================================================================
+        // Element panel — shows GB cards for the selected element + dataset
+        // =====================================================================
+        async function loadElementForDataset(dsId, symbol, name) {
+            const panel = document.querySelector(`.dataset-panel[data-ds="${dsId}"]`);
+            if (!panel) return;
 
-        // ── GB filter ─────────────────────────────────────────────
-        function setGBFilter(dsId, gb, btn) {
-            dsState[dsId].gb = gb;
-            const bar = document.getElementById(`gb-filter-${dsId}`);
-            if (bar) bar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderDatasetTable(dsId);
-        }
+            // mark active cell
+            panel.querySelectorAll('.element-cell').forEach(c => c.classList.remove('active'));
+            const cell = panel.querySelector(`.element-cell[data-symbol="${symbol}"]`);
+            if (cell) cell.classList.add('active');
 
-        // ── Table rendering ───────────────────────────────────────
-        function getFilteredSorted(dsId, records) {
-            if (!records) {
-                records = (currentRecords || []).filter(r => r.dataset_id === dsId);
+            const aside = panel.querySelector('.browse-element-panel');
+
+            const info = STATE.elementIndex && STATE.elementIndex[symbol];
+            const dsInfo = info && info.datasets && info.datasets[dsId];
+            if (!dsInfo) {
+                aside.innerHTML = `<div class="element-empty"><p><strong>${name}</strong> (${symbol}) is not in this dataset.</p></div>`;
+                return;
             }
-            const st = dsState[dsId] || { gb: 'all', sortCol: 'Eseg', sortAsc: true };
-            let filtered = records;
-            if (st.gb !== 'all') {
-                filtered = filtered.filter(r => r.GB === st.gb);
-            }
-            filtered = [...filtered].sort((a, b) => {
-                let va = a[st.sortCol], vb = b[st.sortCol];
-                if (va == null) return 1;
-                if (vb == null) return -1;
-                if (typeof va === 'string') return st.sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-                return st.sortAsc ? va - vb : vb - va;
-            });
-            return filtered;
-        }
 
-        function renderDatasetTable(dsId, records) {
-            const wrap = document.getElementById(`table-${dsId}`);
-            if (!wrap) return;
-            const filtered = getFilteredSorted(dsId, records);
-            const st = dsState[dsId];
+            aside.innerHTML = `<div class="element-loading">Loading <strong>${symbol}</strong>…</div>`;
 
-            // Determine columns from data
-            const cols = [];
-            const sample = filtered[0] || {};
-            if ('GB' in sample) cols.push({ key: 'GB', label: 'Grain Boundary' });
-            if ('site' in sample) cols.push({ key: 'site', label: 'Site' });
-            if ('state' in sample) cols.push({ key: 'state', label: 'State' });
-            if ('Eseg' in sample) cols.push({ key: 'Eseg', label: 'E_seg (eV)' });
-            if ('energy' in sample) cols.push({ key: 'energy', label: 'Energy (eV)' });
-            if ('convergence' in sample) cols.push({ key: 'convergence', label: 'Converged' });
-            if ('n_Fe' in sample) cols.push({ key: 'n_Fe', label: 'n_Fe' });
-            if ('scf_steps' in sample) cols.push({ key: 'scf_steps', label: 'SCF Steps' });
-
-            let html = '<table class="detail-table"><thead><tr>';
-            cols.forEach(c => {
-                const arrow = st.sortCol === c.key ? (st.sortAsc ? ' &#9650;' : ' &#9660;') : '';
-                html += `<th onclick="sortDataset('${dsId}','${c.key}')">${c.label}${arrow}</th>`;
-            });
-            html += '</tr></thead><tbody>';
-
-            if (filtered.length === 0) {
-                html += `<tr><td colspan="${cols.length}" style="text-align:center;color:#999;padding:1.5rem;">No records match filters.</td></tr>`;
+            // load per-element records (cached)
+            let records;
+            if (STATE.elementCache[symbol]) {
+                records = STATE.elementCache[symbol];
             } else {
-                filtered.forEach(r => {
-                    html += '<tr>';
-                    cols.forEach(c => {
-                        let val = r[c.key];
-                        if (c.key === 'Eseg' || c.key === 'energy') val = val != null ? val.toFixed(4) : '-';
-                        else if (c.key === 'convergence') val = val ? 'Yes' : 'No';
-                        else if (val == null) val = '-';
-                        html += `<td>${val}</td>`;
-                    });
-                    html += '</tr>';
-                });
+                try {
+                    const r = await fetch(`data/elements/${symbol}.json`);
+                    records = await r.json();
+                    STATE.elementCache[symbol] = records;
+                } catch (e) {
+                    console.error(e);
+                    aside.innerHTML = `<div class="element-empty"><p>Failed to load data for ${symbol}.</p></div>`;
+                    return;
+                }
             }
-            html += '</tbody></table>';
-            wrap.innerHTML = html;
+
+            const dsRecords = records.filter(r => r.dataset_id === dsId);
+            renderElementPanel(dsId, symbol, name, dsInfo, dsRecords, aside);
         }
 
-        function sortDataset(dsId, col) {
-            const st = dsState[dsId];
-            if (st.sortCol === col) { st.sortAsc = !st.sortAsc; }
-            else { st.sortCol = col; st.sortAsc = true; }
-            renderDatasetTable(dsId);
-        }
-
-        // ── CSV download ──────────────────────────────────────────
-        function downloadDatasetCSV(dsId) {
-            const filtered = getFilteredSorted(dsId);
-            if (!filtered.length) return;
-            const cols = Object.keys(filtered[0]).filter(k => !k.startsWith('dataset_'));
-            let csv = cols.join(',') + '\n';
-            filtered.forEach(r => {
-                csv += cols.map(c => {
-                    let v = r[c];
-                    if (v == null) return '';
-                    if (typeof v === 'string' && v.includes(',')) return `"${v}"`;
-                    return v;
-                }).join(',') + '\n';
+        function renderElementPanel(dsId, symbol, name, dsInfo, dsRecords, aside) {
+            // Group records by GB
+            const byGB = {};
+            dsRecords.forEach(r => {
+                if (!byGB[r.GB]) byGB[r.GB] = [];
+                byGB[r.GB].push(r);
             });
-            const blob = new Blob([csv], { type: 'text/csv' });
+
+            const gbList = (STATE.structuresIndex[dsId] || []).map(g => g.GB);
+
+            // Determine global Eseg range for this element across this dataset
+            const allEseg = dsRecords.map(r => r.Eseg).filter(v => v != null);
+            const eMin = allEseg.length ? Math.min(...allEseg) : null;
+            const eMax = allEseg.length ? Math.max(...allEseg) : null;
+
+            let html = `
+                <div class="element-header">
+                    <div class="element-symbol">${symbol}</div>
+                    <div>
+                        <div class="element-name">${name}</div>
+                        <div class="element-sub">${dsInfo.count} records · ${dsInfo.n_grain_boundaries} GBs · ${dsInfo.n_sites} sites</div>
+                    </div>
+                </div>
+                <div class="element-stats">
+                    <div class="stat sm"><div class="stat-num">${dsInfo.Eseg_mean ?? '–'} <span class="unit">eV</span></div><div class="stat-lbl">Mean E<sub>seg</sub></div></div>
+                    <div class="stat sm"><div class="stat-num">${dsInfo.Eseg_min ?? '–'}</div><div class="stat-lbl">Min</div></div>
+                    <div class="stat sm"><div class="stat-num">${dsInfo.Eseg_max ?? '–'}</div><div class="stat-lbl">Max</div></div>
+                </div>
+                <h4 class="gb-list-heading">Grain boundaries</h4>
+                <p class="gb-list-help">Click a card to load the structure with sites colored by E<sub>seg</sub>.</p>
+                <div class="gb-card-list">
+            `;
+            gbList.forEach(gb => {
+                const recs = byGB[gb] || [];
+                if (!recs.length) {
+                    html += `<div class="gb-card disabled"><div class="gb-name"><code>${gb}</code></div><div class="gb-meta">no data</div></div>`;
+                    return;
+                }
+                const ess = recs.map(r => r.Eseg).filter(v => v != null);
+                const minE = Math.min(...ess), maxE = Math.max(...ess);
+                html += `
+                    <button class="gb-card" data-gb="${gb}" data-element="${symbol}" data-ds="${dsId}">
+                        <div class="gb-name"><code>${gb}</code></div>
+                        <div class="gb-meta">
+                            <span>${recs.length} site${recs.length === 1 ? '' : 's'}</span>
+                            <span class="gb-eseg">E<sub>seg</sub>: ${minE.toFixed(2)} … ${maxE.toFixed(2)} eV</span>
+                        </div>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            aside.innerHTML = html;
+            aside.querySelectorAll('.gb-card:not(.disabled)').forEach(card => {
+                card.onclick = () => openViewer(dsId, card.dataset.gb, symbol, name);
+            });
+        }
+
+        // =====================================================================
+        // 3D Viewer (3Dmol.js)
+        // =====================================================================
+        async function openViewer(dsId, gb, element, elementName) {
+            const panel = document.querySelector(`.dataset-panel[data-ds="${dsId}"]`);
+            const region = panel.querySelector('.browse-viewer-region');
+            region.hidden = false;
+
+            const isUnrelaxed = dsId === 'fe_x_gb_kp_unrelaxed';
+            const noteRelaxed = dsId === 'fe_x_gb_kp_relaxed';
+
+            const cacheKey = `${dsId}/${gb}`;
+            let payload = STATE.structureCache[cacheKey];
+            if (!payload) {
+                region.innerHTML = `<div class="viewer-loading">Loading structure for <code>${gb}</code>…</div>`;
+                try {
+                    const resp = await fetch(`data/structures/${dsId}/${gb}.json`);
+                    payload = await resp.json();
+                    STATE.structureCache[cacheKey] = payload;
+                } catch (e) {
+                    console.error(e);
+                    region.innerHTML = `<div class="viewer-loading">Failed to load <code>${gb}</code>.</div>`;
+                    return;
+                }
+            }
+
+            // Build the viewer scaffold
+            region.innerHTML = `
+                <div class="viewer-header">
+                    <div class="viewer-title">
+                        <span class="viewer-element-pill" style="background:${cssColor(elementColor(element))}">${element}</span>
+                        in <code>${gb}</code>
+                    </div>
+                    <div class="viewer-actions">
+                        <a class="download-btn small" href="data/structures/${dsId}/${gb}.json" download="${gb}-${dsId}.json">Site data (JSON)</a>
+                        <button class="download-btn small" id="dl-poscar-${dsId}">Host slab (POSCAR)</button>
+                    </div>
+                </div>
+                ${noteRelaxed ? `<div class="viewer-note">Showing the <strong>unrelaxed</strong> host slab geometry as reference. Site colors use the <em>relaxed</em> E<sub>seg</sub> values for ${element}. Download the full Parquet (Overview tab) for relaxed atomic positions.</div>` : ''}
+                <div class="viewer-stage">
+                    <div class="viewer-3d" id="viewer3d-${dsId}"></div>
+                    <aside class="viewer-side">
+                        <div class="viewer-tooltip" id="vt-${dsId}">
+                            <div class="vt-empty">Hover an atom for details.</div>
+                        </div>
+                        <div class="colormap-block">
+                            <div class="cm-label"><strong>E<sub>seg</sub> colormap</strong> (eV)</div>
+                            <div class="colormap-bar" id="cm-bar-${dsId}"></div>
+                            <div class="cm-ticks" id="cm-ticks-${dsId}"></div>
+                            <div class="cm-help">Blue ⇒ favourable segregation; red ⇒ unfavourable.</div>
+                        </div>
+                        <div class="site-list-block">
+                            <div class="cm-label"><strong>Sites</strong></div>
+                            <div class="site-list" id="site-list-${dsId}"></div>
+                        </div>
+                    </aside>
+                </div>
+            `;
+
+            buildViewer(dsId, payload, element, elementName);
+            // POSCAR download
+            document.getElementById(`dl-poscar-${dsId}`).onclick = () => downloadPOSCAR(payload, gb);
+
+            // Scroll into view
+            region.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function buildViewer(dsId, payload, element, elementName) {
+            const containerId = `viewer3d-${dsId}`;
+            const container = document.getElementById(containerId);
+            // Tear down any prior viewer (the surrounding DOM has been replaced,
+            // so its canvas is orphaned)
+            if (STATE.viewers[dsId] && STATE.viewers[dsId].gl3dViewer) {
+                try { STATE.viewers[dsId].gl3dViewer.clear(); } catch (e) {}
+            }
+
+            const config = { backgroundColor: 'white' };
+            const viewer = $3Dmol.createViewer(container, config);
+            STATE.viewers[dsId] = { gl3dViewer: viewer, currentGB: payload.GB, currentElement: element };
+
+            // Build atom list. Site atoms get colored by their Eseg (for the chosen
+            // solute element); host atoms remain muted.
+            const siteByIndex = {};
+            payload.sites.forEach(s => { siteByIndex[s.atom_index] = s; });
+
+            // Determine Eseg range for this (GB, element) for normalization
+            const esegs = payload.sites
+                .map(s => s.eseg_by_element[element])
+                .filter(v => v != null);
+            const eMin = esegs.length ? Math.min(...esegs) : -1;
+            const eMax = esegs.length ? Math.max(...esegs) : 1;
+            const absMax = Math.max(Math.abs(eMin), Math.abs(eMax)) || 1;
+
+            const atoms = payload.host_atoms.map((a, i) => {
+                const site = siteByIndex[i];
+                const isSite = !!site;
+                const eseg = isSite ? site.eseg_by_element[element] : null;
+                const sym = isSite ? element : a.element;
+                const radius = elementRadius(sym) * (isSite ? 0.55 : 0.40);
+                const color = isSite
+                    ? (eseg == null ? 0xcccccc : esegToColor(eseg, absMax))
+                    : 0xc7c7c7;  // muted host
+
+                return {
+                    elem: sym,
+                    x: a.xyz[0],
+                    y: a.xyz[1],
+                    z: a.xyz[2],
+                    serial: i,
+                    properties: {
+                        is_site: isSite,
+                        site_label: isSite ? site.label : null,
+                        eseg: eseg,
+                        host_element: a.element,
+                        sub_element: isSite ? element : null,
+                        radius,
+                        color,
+                    },
+                };
+            });
+
+            viewer.removeAllModels();
+            viewer.removeAllShapes();
+            const m = viewer.addModel();
+            m.addAtoms(atoms);
+
+            // Per-atom styling — sphere with custom radius/color
+            atoms.forEach(a => {
+                viewer.setStyle(
+                    { serial: a.serial },
+                    { sphere: { radius: a.properties.radius, color: a.properties.color, opacity: a.properties.is_site ? 1.0 : 0.85 } }
+                );
+            });
+
+            // Bonds: draw thin sticks between near-neighbors (cutoff ≈ 3.0 Å) so the
+            // grain boundary structure reads visually. We render this as cylinders to
+            // avoid the auto-bonding heuristic which can be wrong for crystals.
+            drawBonds(viewer, atoms, payload.lattice);
+
+            // Unit cell box
+            drawUnitCell(viewer, payload.lattice);
+
+            // Hover handlers
+            const tooltipEl = document.getElementById(`vt-${dsId}`);
+            viewer.setHoverable(
+                {},
+                true,
+                function(atom, vw) {
+                    if (!atom) return;
+                    showTooltip(tooltipEl, atom, element, elementName);
+                    // Re-render this atom slightly larger (replace, not add)
+                    viewer.setStyle({ serial: atom.serial }, {
+                        sphere: { radius: atom.properties.radius * 1.25, color: atom.properties.color, opacity: 1.0 }
+                    });
+                    viewer.render();
+                },
+                function(atom, vw) {
+                    if (!atom) return;
+                    clearTooltip(tooltipEl);
+                    viewer.setStyle({ serial: atom.serial }, {
+                        sphere: { radius: atom.properties.radius, color: atom.properties.color, opacity: atom.properties.is_site ? 1.0 : 0.85 }
+                    });
+                    viewer.render();
+                }
+            );
+
+            // Click to highlight site in the side list
+            viewer.setClickable({ }, true, function(atom) {
+                if (!atom || !atom.properties.is_site) return;
+                document.querySelectorAll(`#site-list-${dsId} .site-row`).forEach(r => {
+                    r.classList.toggle('active', r.dataset.label === atom.properties.site_label);
+                });
+            });
+
+            viewer.zoomTo();
+            viewer.render();
+            viewer.zoom(1.1, 500);
+
+            // Side: colormap legend + site list
+            renderColormap(dsId, eMin, eMax, absMax);
+            renderSiteList(dsId, payload, element, elementName, viewer);
+        }
+
+        // ---- Bond drawing -------------------------------------------------
+        function drawBonds(viewer, atoms, lattice) {
+            // Brute-force pairs within 3.0 Å (no PBC images for v1; cell is large
+            // enough that visual bonds are mostly correct).
+            const cutoff2 = 3.0 * 3.0;
+            for (let i = 0; i < atoms.length; i++) {
+                for (let j = i + 1; j < atoms.length; j++) {
+                    const dx = atoms[i].x - atoms[j].x;
+                    const dy = atoms[i].y - atoms[j].y;
+                    const dz = atoms[i].z - atoms[j].z;
+                    const d2 = dx*dx + dy*dy + dz*dz;
+                    if (d2 < cutoff2 && d2 > 0.5) {
+                        viewer.addCylinder({
+                            start: { x: atoms[i].x, y: atoms[i].y, z: atoms[i].z },
+                            end:   { x: atoms[j].x, y: atoms[j].y, z: atoms[j].z },
+                            radius: 0.08,
+                            color: 0xb0b0b0,
+                            fromCap: 1, toCap: 1,
+                        });
+                    }
+                }
+            }
+        }
+
+        function drawUnitCell(viewer, latticeMatrix) {
+            const a = latticeMatrix[0];
+            const b = latticeMatrix[1];
+            const c = latticeMatrix[2];
+            const o = [0, 0, 0];
+            const v = (p, q) => ({
+                start: { x: p[0], y: p[1], z: p[2] },
+                end:   { x: q[0], y: q[1], z: q[2] },
+                radius: 0.04, color: 0x2563eb, dashed: false,
+            });
+            const add = (p, q) => viewer.addCylinder(v(p, q));
+            const ab = [a[0]+b[0], a[1]+b[1], a[2]+b[2]];
+            const ac = [a[0]+c[0], a[1]+c[1], a[2]+c[2]];
+            const bc = [b[0]+c[0], b[1]+c[1], b[2]+c[2]];
+            const abc = [a[0]+b[0]+c[0], a[1]+b[1]+c[1], a[2]+b[2]+c[2]];
+            // bottom face
+            add(o, a); add(o, b); add(a, ab); add(b, ab);
+            // top face
+            add(c, ac); add(c, bc); add(ac, abc); add(bc, abc);
+            // verticals
+            add(o, c); add(a, ac); add(b, bc); add(ab, abc);
+        }
+
+        // ---- Tooltip ------------------------------------------------------
+        function showTooltip(el, atom, soluteElement, soluteName) {
+            const p = atom.properties || {};
+            const xyz = `[${atom.x.toFixed(2)}, ${atom.y.toFixed(2)}, ${atom.z.toFixed(2)}] Å`;
+            if (p.is_site) {
+                const ePill = `<span class="vt-pill" style="background:${cssColor(elementColor(soluteElement))}">${soluteElement}</span>`;
+                const eseg = (p.eseg != null) ? `${p.eseg.toFixed(3)} eV` : '—';
+                const segClass = p.eseg == null ? '' : (p.eseg < 0 ? 'neg' : 'pos');
+                el.innerHTML = `
+                    <div class="vt-row vt-title">${ePill} Substitutional site <strong>${p.site_label}</strong></div>
+                    <div class="vt-row"><span class="vt-k">If solute = ${soluteElement}:</span></div>
+                    <div class="vt-row vt-eseg ${segClass}"><span class="vt-k">E<sub>seg</sub></span> <span class="vt-v">${eseg}</span></div>
+                    <div class="vt-row"><span class="vt-k">Position</span> <span class="vt-v">${xyz}</span></div>
+                    <div class="vt-row vt-foot">Host site is Fe; coloring shows what E<sub>seg</sub> would be if ${soluteName} were placed here.</div>
+                `;
+            } else {
+                el.innerHTML = `
+                    <div class="vt-row vt-title">Host atom: <strong>Fe</strong></div>
+                    <div class="vt-row"><span class="vt-k">Position</span> <span class="vt-v">${xyz}</span></div>
+                    <div class="vt-row vt-foot">Bulk Fe site (no segregation data).</div>
+                `;
+            }
+        }
+        function clearTooltip(el) {
+            el.innerHTML = `<div class="vt-empty">Hover an atom for details.</div>`;
+        }
+
+        // ---- Side colormap + site list -----------------------------------
+        function renderColormap(dsId, eMin, eMax, absMax) {
+            const bar = document.getElementById(`cm-bar-${dsId}`);
+            const ticks = document.getElementById(`cm-ticks-${dsId}`);
+            // Build a CSS gradient sampling the same colormap function.
+            const stops = [];
+            const N = 11;
+            for (let i = 0; i < N; i++) {
+                const t = i / (N - 1);          // 0..1
+                const e = -absMax + 2 * absMax * t;
+                stops.push(`${cssColor(esegToColor(e, absMax))} ${(t*100).toFixed(0)}%`);
+            }
+            bar.style.background = `linear-gradient(90deg, ${stops.join(', ')})`;
+            ticks.innerHTML = `
+                <span>${(-absMax).toFixed(2)}</span>
+                <span>0</span>
+                <span>+${absMax.toFixed(2)}</span>
+            `;
+        }
+
+        function renderSiteList(dsId, payload, element, elementName, viewer) {
+            const host = document.getElementById(`site-list-${dsId}`);
+            // Sort sites by Eseg ascending (most-segregating first)
+            const sorted = [...payload.sites].sort((a, b) => {
+                const ea = a.eseg_by_element[element], eb = b.eseg_by_element[element];
+                if (ea == null && eb == null) return 0;
+                if (ea == null) return 1;
+                if (eb == null) return -1;
+                return ea - eb;
+            });
+            const absMax = Math.max(...payload.sites.map(s => Math.abs(s.eseg_by_element[element] ?? 0))) || 1;
+
+            host.innerHTML = sorted.map(s => {
+                const e = s.eseg_by_element[element];
+                const eStr = e == null ? '—' : `${e.toFixed(3)} eV`;
+                const swatch = e == null ? '#ddd' : cssColor(esegToColor(e, absMax));
+                return `<div class="site-row" data-label="${s.label}">
+                    <span class="site-swatch" style="background:${swatch}"></span>
+                    <span class="site-label">site ${s.label}</span>
+                    <span class="site-eseg ${e == null ? '' : (e < 0 ? 'neg' : 'pos')}">${eStr}</span>
+                </div>`;
+            }).join('');
+            // Click site row -> focus the camera on that atom
+            host.querySelectorAll('.site-row').forEach(row => {
+                row.onclick = () => {
+                    const label = row.dataset.label;
+                    const s = payload.sites.find(x => x.label === label);
+                    if (!s) return;
+                    viewer.zoomTo({ serial: s.atom_index });
+                    viewer.zoom(1.6, 400);
+                    host.querySelectorAll('.site-row').forEach(r => r.classList.toggle('active', r === row));
+                };
+            });
+        }
+
+        // ---- Eseg → color (diverging blue–white–red, perceptual-ish) -----
+        // Negative Eseg = favourable segregation = blue.
+        // Positive Eseg = unfavourable = red.
+        function esegToColor(e, absMax) {
+            const t = Math.max(-1, Math.min(1, e / absMax));   // -1..1
+            // map to 0..1
+            const s = (t + 1) / 2;
+            // 3-stop gradient: blue (#2563eb) — white (#f8fafc) — red (#dc2626)
+            const stops = [
+                [0.0, [37, 99, 235]],
+                [0.5, [248, 250, 252]],
+                [1.0, [220, 38, 38]],
+            ];
+            for (let i = 0; i < stops.length - 1; i++) {
+                const [t0, c0] = stops[i];
+                const [t1, c1] = stops[i + 1];
+                if (s >= t0 && s <= t1) {
+                    const f = (s - t0) / (t1 - t0);
+                    const r = Math.round(c0[0] + f * (c1[0] - c0[0]));
+                    const g = Math.round(c0[1] + f * (c1[1] - c0[1]));
+                    const b = Math.round(c0[2] + f * (c1[2] - c0[2]));
+                    return (r << 16) | (g << 8) | b;
+                }
+            }
+            return 0xffffff;
+        }
+        function cssColor(intColor) {
+            return '#' + intColor.toString(16).padStart(6, '0');
+        }
+
+        // ---- POSCAR download (host slab, all-Fe) -------------------------
+        function downloadPOSCAR(payload, gb) {
+            const lines = [];
+            lines.push(`${gb} host slab (Fe-only) — exported from ligerzero.com`);
+            lines.push('1.0');
+            payload.lattice.forEach(row => {
+                lines.push(row.map(v => v.toFixed(8)).join(' '));
+            });
+            lines.push('Fe');
+            lines.push(`${payload.host_atoms.length}`);
+            lines.push('Cartesian');
+            payload.host_atoms.forEach(a => {
+                lines.push(a.xyz.map(v => v.toFixed(8)).join(' '));
+            });
+            const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `${currentSymbol}_${dsId}.csv`;
+            a.href = url; a.download = `${gb}_host.POSCAR`;
             a.click();
             URL.revokeObjectURL(url);
         }
+
+        // =====================================================================
+        // Boot
+        // =====================================================================
+        // Wait for fonts/CSS so layout is stable before we ask 3Dmol to size.
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

@@ -139,6 +139,12 @@ const GitHubAuth = {
     // ---- Private methods ----
 
     _isProtectedPage() {
+        // Local development bypass: anything served over plain HTTP (or file://)
+        // is treated as local. Production Cloudflare Pages is always HTTPS, so
+        // this never trips on the live site.
+        if (window.location.protocol !== 'https:') {
+            return false;
+        }
         const path = window.location.pathname;
         const page = path.split('/').pop() || 'index.html';
         return AUTH_CONFIG.protectedPages.includes(page);
